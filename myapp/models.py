@@ -101,4 +101,4 @@ class Grade(models.Model):
 class Announcement(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
-    date_posted = models.DateTimeField(auto_now_add=True)  # <- this line used to be `created_at`
+    created_at = models.DateTimeField(auto_now_add=True)  # <- this line used to be `created_at`
