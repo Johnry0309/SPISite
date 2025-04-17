@@ -14,54 +14,60 @@
 
     <!-- Swiper.js CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css">
-
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
     <style>
-        /* Sticky Announcement Container */
+        .announcement-carousel-wrapper {
+            overflow: hidden;
+            border: 1px solid #cccccc69;
+            border-radius: 20px;
+            background-color: #f1d63edc;
+            height: 100px;
+            position: relative;
+        }
+
+        .announcement-carousel {
+            display: flex;
+            animation: scroll-left 20s linear infinite;
+            gap: 40px;
+            padding-left: 100%;
+        }
+
+        .announcement-slide {
+            white-space: nowrap;
+            flex-shrink: 0;
+            padding: 10px 20px;
+            background: #e3f2fd00;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .carousel-link {
+            text-decoration: none;
+            color: #1d3557;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .carousel-link:hover {
+            text-decoration: underline;
+        }
+
+        @keyframes scroll-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
         .announcement-container {
-            background-color: #FFD700; /* Gold color */
-            color: #006400; /* Green color */
+            background-color: #FFD700;
+            color: #006400;
             padding: 15px;
             position: sticky;
             top: 0;
             z-index: 10;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 100%;
             text-align: center;
             font-weight: bold;
-        }
-
-        /* Styling for the marquee section */
-        .marquee-container {
-            margin: 20px 0;
-            padding: 10px;
-            background-color: #e9ecef;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Marquee text style */
-        .marquee-container marquee {
-            font-size: 18px;
-            color: #007bff;
-            font-weight: bold;
-        }
-
-        /* Spacing between each announcement in the marquee */
-        .marquee-container li {
-            margin-right: 100px;
-        }
-
-        .marquee-container img {
-            max-width: 100px;
-            margin-left: 10px;
-            border-radius: 5px;
-        }
-
-        /* Revert the rest of the styles */
-        body {
-            font-family: Arial, sans-serif;
         }
 
         .choose-spi {
@@ -84,10 +90,22 @@
             border-radius: 2px;
         }
 
-        .video-container { text-align: center; padding: 40px 0; }
-        .video-container video { width: 40%; border-radius: 15px; box-shadow: 0px 0px 15px rgba(0,0,0,0.2); }
+        .video-container {
+            text-align: center;
+            padding: 40px 0;
+        }
 
-        .apply-btn-container { text-align: center; margin-top: 20px; }
+        .video-container video {
+            width: 40%;
+            border-radius: 15px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+        }
+
+        .apply-btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
         .apply-btn {
             background-color: gold;
             color: black;
@@ -99,73 +117,68 @@
             display: inline-block;
             transition: background-color 0.3s;
         }
-        .apply-btn:hover { background-color: darkgoldenrod; }
+
+        .apply-btn:hover {
+            background-color: darkgoldenrod;
+        }
 
         .scroll-section {
-            padding: 0;
             margin-top: 0;
             transition: background-color 0.5s ease-in-out;
         }
-        .scroll-section:nth-child(odd) { background-color: rgba(0,128,0,0.1); }
-        .scroll-section:nth-child(even) { background-color: rgba(255,215,0,0.1); }
 
-        /* Swiper Container - Center & Remove Side Previews */
+        .scroll-section:nth-child(odd) {
+            background-color: rgba(0,128,0,0.1);
+        }
+
+        .scroll-section:nth-child(even) {
+            background-color: rgba(255,215,0,0.1);
+        }
+
         .swiper-container {
             width: 80%;
             max-width: 800px;
             margin: 0 auto;
-            margin-top: 10;
             overflow: hidden;
         }
 
-        /* Single Image Per View & Enlarged Image */
         .swiper-slide {
             display: flex;
             justify-content: center;
             align-items: center;
         }
-        
+
         .swiper-slide img {
             max-width: 100%;
             max-height: 600px;
             object-fit: contain;
             border-radius: 10px;
         }
+
+        .carousel-inner {
+            min-height: 400px;
+            background-color: #f8f9fa;
+        }
+
         .carousel-inner .carousel-item img {
             object-fit: contain;
             width: 100%;
             height: 400px;
             object-position: center;
-            margin-bottom: 100px;
+        }
+        .carousel,
+        .carousel-inner,
+        .carousel-item {
+            background-color: transparent !important;
         }
     </style>
 </head>
 <body>
     {% include 'myapp/header.html' %}
     {% include 'myapp/nav.html' %}
-    {% block content%}
+    {% block content %}
 
-    
-    <div class="container py-5">
-        <div class="announcement-container mt-4 mb-5">
-            {% if announcements %}
-                <div class="announcement-list">
-                    {% for announcement in announcements %}
-                        <div class="announcement-item">
-                            <a href="{% url 'announcement_page' announcement.id %}" class="announcement-link">
-                                <strong>{{ announcement.title }}</strong> - {{ announcement.created_at|date:"M d, Y" }}
-                                <br>{{ announcement.body|truncatewords:20 }}
-                            </a>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <span>No announcements posted yet.</span>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- Carousel Section -->
+    <!-- Image Carousel Section -->
     <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
             {% for image in carousel_images %}
@@ -175,6 +188,26 @@
                     </a>
                 </div>
             {% endfor %}
+        </div>
+    </div>
+
+    <!-- Announcement Carousel -->
+    <div class="container py-5">
+        <div class="announcement-carousel-wrapper">
+            {% if announcements %}
+                <div class="announcement-carousel" id="announcement-carousel">
+                    {% for announcement in announcements %}
+                        <div class="announcement-slide">
+                            <a href="{% url 'announcement_page' announcement.id %}" class="carousel-link">
+                                <strong>{{ announcement.title }}</strong> - {{ announcement.created_at|date:"M d, Y" }}
+                                <br>{{ announcement.content|truncatewords:15 }}
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-announcements">No announcements posted yet.</div>
+            {% endif %}
         </div>
     </div>
 
@@ -194,9 +227,8 @@
         <a href="{% url 'apply_online' %}" class="apply-btn">Apply Now</a>
     </div>
 
-    <!-- Scrolling Sections -->
+    <!-- Image Slider -->
     <div class="scroll-section text-center">
-        <!-- Swiper.js Carousel -->
         <div class="swiper-container">
             <div class="swiper-wrapper">
                 {% for image in slider_images %}
@@ -214,8 +246,8 @@
         <h2>Upcoming Events</h2>
         <p>Don’t miss our orientation and campus tour.</p>
     </div>
+
     {% endblock %}
-    <!-- Footer -->
     {% include 'myapp/footer.html' %}
 
     <!-- Bootstrap & Swiper JS -->
@@ -228,10 +260,6 @@
             autoplay: { delay: 3000 },
             slidesPerView: 1,
             centeredSlides: true,
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
         });
 
         var myCarousel = new bootstrap.Carousel(document.querySelector('#carouselExample'), {
@@ -239,6 +267,5 @@
             ride: 'carousel'
         });
     </script>
-
 </body>
 </html>

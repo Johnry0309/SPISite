@@ -1,0 +1,36 @@
+{% include 'myapp/header.html' %}
+{% include 'myapp/nav.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card shadow-lg p-4">
+        <!-- Image Section -->
+        <div class="announcement-image mb-4">
+            {% if announcement.image %}
+                <img src="{{ announcement.image.url }}" alt="{{ announcement.title }}" class="img-fluid rounded">
+            {% else %}
+                <!-- If no image, you can display a message or leave it empty -->
+                <!-- For now, let's leave it empty to avoid showing a broken image -->
+            {% endif %}
+        </div>
+
+        <!-- Title Section -->
+        <h2 class="text-success mb-3">{{ announcement.title }}</h2>
+        <p class="text-muted">{{ announcement.created_at|date:"F d, Y" }}</p>
+        <hr>
+
+        <!-- Body Section -->
+        <div class="fs-5">
+            {{ announcement.content|linebreaks }}
+        </div>
+
+        <!-- Back to Home Button -->
+        <div class="mt-4">
+            <a href="{% url 'home' %}" class="btn btn-outline-success">← Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% include 'myapp/footer.html' %}

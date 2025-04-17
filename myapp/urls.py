@@ -65,7 +65,8 @@ urlpatterns = [
     path('announcements/<int:id>/', views.public_announcement_detail, name='public_announcement_detail'),
     path('announcement/<int:id>/', views.announcement_detail, name='announcement_page'),
     path('delete_announcement/<int:pk>/', views.delete_announcement, name='delete_announcement'),
- 
+    path('announcement/<int:announcement_id>/', views.announcement_page, name='announcement_page'),
+
  
  
     # Applications

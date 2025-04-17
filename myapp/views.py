@@ -17,6 +17,10 @@ from django.shortcuts import render, redirect
 from .models import Class, Announcement  # Assuming you have a Class model
 from django.http import HttpResponseForbidden
 
+def announcement_page(request, announcement_id):
+    announcement = get_object_or_404(Announcement, id=announcement_id)
+    return render(request, 'myapp/announcement_detail.html', {'announcement': announcement})
+
 def manage_announcements(request):
     if request.method == 'POST':
         form = AnnouncementForm(request.POST, request.FILES)
@@ -34,11 +38,11 @@ def manage_announcements(request):
 
 def announcement_detail(request, id):
     announcement = get_object_or_404(Announcement, id=id)
-    return render(request, 'announcement_page.html', {'announcement': announcement})
+    return render(request, 'myapp/announcement_detail.html', {'announcement': announcement})
 
 def public_announcement_detail(request, id):
     announcement = get_object_or_404(Announcement, id=id)
-    return render(request, 'announcement_page.html', {'announcement': announcement})
+    return render(request, 'myapp/announcement_detail.html', {'announcement': announcement})
 
 def delete_announcement(request, pk):
     # Ensure the user has the proper permissions (e.g., admin or staff).
