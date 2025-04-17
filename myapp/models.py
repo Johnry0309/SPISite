@@ -98,7 +98,13 @@ class Grade(models.Model):
     def __str__(self):
         return f"{self.student.username} - {self.course_name}: {self.grade}"
     
+
+
 class Announcement(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)  # <- this line used to be `created_at`
+    image = models.ImageField(upload_to='announcements/', blank=True, null=True)  # Add this
+    created_at = models.DateTimeField(auto_now_add=True)  # ✅ Add this line
+
+    def __str__(self):
+        return self.title

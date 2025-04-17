@@ -1,6 +1,7 @@
 from django import forms
 from .models import Application, Subject, Class, TeacherProfile, ClassAssignment,  Announcement
 
+
 class ApplicationForm(forms.ModelForm):
     class Meta:
         model = Application
@@ -94,7 +95,9 @@ class AddClassForm(forms.Form):
     room = forms.CharField(max_length=10, label='Room', required=True)
 
 
+
+
 class AnnouncementForm(forms.ModelForm):
     class Meta:
         model = Announcement
-        fields = ['title', 'content']
+        fields = ['title', 'content', 'image']  
