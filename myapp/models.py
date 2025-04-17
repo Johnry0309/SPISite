@@ -1,6 +1,8 @@
 # myapp/models.py
 from django.db import models
 from django.contrib.auth.models import User  # Import User if you link applications to user accounts
+from django.db import models
+from django.contrib.auth.models import User
 
 class Application(models.Model):
     STATUS_CHOICES = [
@@ -9,12 +11,20 @@ class Application(models.Model):
         ('rejected', 'Rejected'),
     ]
 
-    name = models.CharField(max_length=100)  # Applicant's Name
-    address = models.TextField()  # Applicant's Address
-    email = models.EmailField()  # Applicant's Email
-    contact_number = models.CharField(max_length=20)  # Applicant's Phone Number
-    previous_school = models.CharField(max_length=100)  # Applicant's Previous School
-    application_date = models.DateTimeField(auto_now_add=True)  # Date of Application
+    first_name = models.CharField(max_length=255, default=" ")
+    middle_name = models.CharField(max_length=255,  default=" ")
+    last_name  = models.CharField(max_length=255, default=" ")
+    email = models.EmailField()
+    contact_number = models.CharField(max_length=15)
+    previous_school = models.CharField(max_length=255)
+
+    # Address part
+    house_number = models.CharField(max_length=100, default=" ")
+    street_name = models.CharField(max_length=255, default=" ")
+    barangay = models.CharField(max_length=255, default=" ")
+    city_municipality = models.CharField(max_length=255, default=" ")
+    province = models.CharField(max_length=255, blank=True, null=True)  # Still optional
+    country = models.CharField(max_length=100, default=" ")
 
     status = models.CharField(  # Status of Application
         max_length=20,
@@ -27,13 +37,17 @@ class Application(models.Model):
     applicant = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='applications')  # Optional
     notes = models.TextField(blank=True)
 
-    def __str__(self):
-        return f"{self.name} ({self.email}) - {self.get_status_display()}"
+    # New field to store the application date
+    application_date = models.DateTimeField(auto_now_add=True)
 
-    class Meta:  # Add Meta class for ordering and display name
-        verbose_name = "Application"  # Custom name
-        verbose_name_plural = "Applications"  # Custom plural name
-        ordering = ['application_date']  # Default ordering of entries
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} ({self.email}) - {self.get_status_display()}"
+
+    class Meta:
+        verbose_name = "Application"
+        verbose_name_plural = "Applications"
+        ordering = ['application_date']  # Default ordering of entries by application date
+
 
 class ContactMessage(models.Model):
     STATUS_CHOICES = (
