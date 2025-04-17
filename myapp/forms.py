@@ -5,23 +5,37 @@ from .models import Application, Subject, Class, TeacherProfile, ClassAssignment
 class ApplicationForm(forms.ModelForm):
     class Meta:
         model = Application
-        fields = ['name', 'address', 'email', 'contact_number', 'previous_school']
+        fields = [
+            'first_name','middle_name','last_name', 'email', 'contact_number', 'previous_school',
+            'house_number', 'street_name', 'barangay',
+            'city_municipality', 'province', 'country'
+        ]
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'middle_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'contact_number': forms.TextInput(attrs={'class': 'form-control'}),
             'previous_school': forms.TextInput(attrs={'class': 'form-control'}),
+            'house_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'street_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'barangay': forms.TextInput(attrs={'class': 'form-control'}),
+            'city_municipality': forms.TextInput(attrs={'class': 'form-control'}),
+            'province': forms.TextInput(attrs={'class': 'form-control'}),
+            'country': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
-    def clean_name(self):
-        return self.validate_not_empty(self.cleaned_data.get("name"), "Name")
-
-    def clean_address(self):
-        return self.validate_not_empty(self.cleaned_data.get("address"), "Address")
+    def clean_first_name(self):
+        return self.validate_not_empty(self.cleaned_data.get("first_name"), "First Name")
+    
+    def clean_middle_name(self):
+        return self.validate_not_empty(self.cleaned_data.get("middle_name"), "Middle Name")
+    
+    def clean_last_name(self):
+        return self.validate_not_empty(self.cleaned_data.get("last_name"), "Last_Name")
 
     def clean_previous_school(self):
-        return self.validate_not_empty(self.cleaned_data.get("previous_school"), "Previous school")
+        return self.validate_not_empty(self.cleaned_data.get("previous_school"), "Previous School")
 
     def clean_contact_number(self):
         contact_number = self.cleaned_data.get("contact_number", "").strip()
@@ -31,9 +45,26 @@ class ApplicationForm(forms.ModelForm):
             raise forms.ValidationError("Contact number must contain only numbers.")
         return contact_number
 
+    def clean_email(self):
+        return self.validate_not_empty(self.cleaned_data.get("email"), "Email")
+
+    def clean_house_number(self):
+        return self.validate_not_empty(self.cleaned_data.get("house_number"), "House Number")
+
+    def clean_street_name(self):
+        return self.validate_not_empty(self.cleaned_data.get("street_name"), "Street Name")
+
+    def clean_barangay(self):
+        return self.validate_not_empty(self.cleaned_data.get("barangay"), "Barangay")
+
+    def clean_city_municipality(self):
+        return self.validate_not_empty(self.cleaned_data.get("city_municipality"), "City/Municipality")
+
+    def clean_country(self):
+        return self.validate_not_empty(self.cleaned_data.get("country"), "Country")
+
     @staticmethod
     def validate_not_empty(value, field_name):
-        """Helper function to check if a field is empty or contains only spaces."""
         if not value or not value.strip():
             raise forms.ValidationError(f"{field_name} cannot be empty or contain only spaces.")
         return value.strip()
