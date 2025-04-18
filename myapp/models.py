@@ -66,21 +66,25 @@ class ContactMessage(models.Model):
     
 
 class Subject(models.Model):
-    code = models.CharField(max_length=20, unique=True)
-    name = models.CharField(max_length=100)
-    description = models.TextField()
+    subject_code = models.CharField(max_length=20)
+    subject_name = models.CharField(max_length=100)
+    schedule = models.CharField(max_length=50)
+    duration = models.IntegerField()
+    room = models.CharField(max_length=20)
 
     def __str__(self):
         return f"{self.code} - {self.name}"
 
 from django.db import models
 
-class Class(models.Model):  # or whatever your class model is named
+class Class(models.Model):
     subject_code = models.CharField(max_length=20)
     subject_name = models.CharField(max_length=100)
-    schedule = models.CharField(max_length=50)
-    duration = models.PositiveIntegerField()
-    room = models.CharField(max_length=20)
+    schedule = models.CharField(max_length=100)
+    duration = models.IntegerField()
+    room = models.CharField(max_length=50)
+    teacher = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='teaching_classes')
+    students = models.ManyToManyField(User, related_name='enrolled_classes', blank=True)
 
     def __str__(self):
         return f"{self.subject_name} ({self.subject_code})"
@@ -122,3 +126,10 @@ class Announcement(models.Model):
 
     def __str__(self):
         return self.title
+    
+
+class Subject(models.Model):
+
+
+    def __str__(self):
+        return self.subject_name

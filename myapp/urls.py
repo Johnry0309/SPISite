@@ -17,7 +17,8 @@ urlpatterns = [
     path('requirements/', views.requirements, name='requirements'),
     path('application_process/', views.application_process, name='application_process'),
     path('apply/', views.apply_online, name='apply_online'),
-
+    path('class/<int:class_id>/', views.class_detail, name='class_detail'),
+    
     # SPI Campuses
     path('spiantipolo/', views.spiantipolo, name='spiantipolo'),
     path('spiqc/', views.spiqc, name='spiqc'),
@@ -52,7 +53,7 @@ urlpatterns = [
     path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('manage-classes/', views.manage_classes, name='manage_classes'),
     path('add-class/', add_class, name='add_class'),
-    path('assign_class_teacher/', views.assign_class_teacher, name='assign_class_teacher'),
+    path('assign-class-teacher/', views.assign_class_teacher, name='assign_class_teacher'),
     path('assign_class_student/', views.assign_class_student, name='assign_class_student'),
     path('add_delete_admin/', views.add_delete_admin, name='add_delete_admin'),
     path('teacher_dashboard/', views.teacher_dashboard, name='teacher_dashboard'),
