@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.core.files.storage import default_storage, FileSystemStorage
 from django.core.exceptions import ValidationError
 from django.utils.text import slugify
-from .models import Application, ContactMessage, TeacherProfile, Grade
+from .models import Application, ContactMessage, TeacherProfile, Grade, Class, Subject
 from .forms import ApplicationForm, ContactForm, SubjectForm, ClassForm, AssignClassTeacherForm, AssignClassStudentForm, AddClassForm, AnnouncementForm
 from django.utils import timezone
 from django.utils.crypto import get_random_string
@@ -16,6 +16,8 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from .models import Class, Announcement  # Assuming you have a Class model
 from django.http import HttpResponseForbidden
+
+
 
 def announcement_page(request, announcement_id):
     announcement = get_object_or_404(Announcement, id=announcement_id)
@@ -58,11 +60,7 @@ def delete_announcement(request, pk):
     return redirect('manage_announcements')
 
 
-def delete_class(request, class_id):
-    if request.method == 'POST':
-        class_instance = get_object_or_404(Class, id=class_id)
-        class_instance.delete()
-    return redirect('add_class')  # Redirect back to the manage page
+
 
 def add_class(request):
     if request.method == 'POST':
@@ -644,51 +642,143 @@ def delete_message(request, message_id):
 
 # admin class management
 
+
 def manage_classes(request):
-    subject_form = SubjectForm()
-    class_form = ClassForm()
-    assign_teacher_form = AssignClassTeacherForm()
-    assign_student_form = AssignClassStudentForm()
+    classes = Class.objects.all()
+    teachers = User.objects.filter(is_staff=True, is_superuser=False)
+    students = User.objects.filter(is_staff=False)
 
     if request.method == 'POST':
-        if 'add_subject' in request.POST:
-            subject_form = SubjectForm(request.POST)
-            if subject_form.is_valid():
-                subject_form.save()
-        elif 'add_class' in request.POST:
-            class_form = ClassForm(request.POST)
-            if class_form.is_valid():
-                class_form.save()
-        elif 'assign_teacher' in request.POST:
-            assign_teacher_form = AssignClassTeacherForm(request.POST)
-            if assign_teacher_form.is_valid():
-                assign_teacher_form.save()
-        elif 'assign_student' in request.POST:
-            assign_student_form = AssignClassStudentForm(request.POST)
-            if assign_student_form.is_valid():
-                assign_student_form.save()
+        if 'add_class' in request.POST:
+            subject_code = request.POST.get('subject_code')
+            subject_name = request.POST.get('subject_name')
+            schedule = request.POST.get('schedule')
+            duration = request.POST.get('duration')
+            room = request.POST.get('room')
 
-    context = {
-        'subject_form': subject_form,
-        'class_form': class_form,
-        'assign_teacher_form': assign_teacher_form,
-        'assign_student_form': assign_student_form
-    }
-    return render(request, 'myapp/manage_classes.html', context)
+            if all([subject_code, subject_name, schedule, duration, room]):
+                Class.objects.create(
+                    subject_code=subject_code,
+                    subject_name=subject_name,
+                    schedule=schedule,
+                    duration=duration,
+                    room=room
+                )
+                messages.success(request, 'Class added successfully.')
+                return redirect('manage_classes')
+            else:
+                messages.error(request, 'Please fill in all fields.')
+
+        elif 'assign_teacher' in request.POST:
+            class_id = request.POST.get('class_id')
+            teacher_id = request.POST.get('teacher_id')
+
+            try:
+                class_obj = Class.objects.get(id=class_id)
+                teacher = User.objects.get(id=teacher_id)
+                class_obj.teacher = teacher
+                class_obj.save()
+                messages.success(request, 'Class assigned to teacher.')
+            except Exception as e:
+                messages.error(request, f'Error: {e}')
+            return redirect('manage_classes')
+
+        elif 'assign_student' in request.POST:
+            class_id = request.POST.get('class_id')
+            student_id = request.POST.get('student_id')
+
+            try:
+                class_obj = Class.objects.get(id=class_id)
+                student = User.objects.get(id=student_id)
+                class_obj.students.add(student)  # assuming ManyToManyField to User for students
+                messages.success(request, 'Class assigned to student.')
+            except Exception as e:
+                messages.error(request, f'Error: {e}')
+            return redirect('manage_classes')
+
+    return render(request, 'myapp/manage_classes.html', {
+        'classes': classes,
+        'teachers': teachers,
+        'students': students,
+    })
+
+def delete_class(request, class_id):
+    class_obj = get_object_or_404(Class, id=class_id)
+    class_obj.delete()
+    messages.success(request, 'Class deleted successfully.')
+    return redirect('manage_classes')
+
+def add_delete_admin(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        admin_type = request.POST.get('admin_type')
+
+        if username and password and admin_type:
+            if User.objects.filter(username=username).exists():
+                messages.error(request, f'Username "{username}" already exists. Please choose a different one.')
+            else:
+                try:
+                    user = User.objects.create_user(username=username, password=password)
+                    # Assigning roles
+                    if admin_type == 'teacher':
+                        user.is_staff = True  # Only teachers should be 'staff'
+                        user.save()
+                        messages.success(request, f'{username} has been added as a teacher.')
+                    else:
+                        # Handle other types (e.g., students), no 'is_staff' for students
+                        user.save()
+                        messages.success(request, f'{username} has been added as a student.')
+                except Exception as e:
+                    messages.error(request, f'Error creating admin: {e}')
+        else:
+            messages.error(request, 'Please fill in all fields.')
+
+    elif request.method == 'GET' and 'delete' in request.GET:
+        user_id = request.GET['delete']
+        try:
+            user = User.objects.get(id=user_id)
+            user.delete()
+            messages.success(request, f'{user.username} has been deleted.')
+        except User.DoesNotExist:
+            messages.error(request, 'User not found.') 
 
 def assign_class_teacher(request):
     if request.method == 'POST':
-        # Logic for assigning a teacher to a class
-        pass
-    return render(request, 'assign_class_teacher.html')  # Placeholder template
+        class_id = request.POST.get('class_id')
+        teacher_id = request.POST.get('teacher_id')
+
+        try:
+            subject_class = Class.objects.get(id=class_id)
+            teacher = User.objects.get(id=teacher_id)
+
+            subject_class.teacher = teacher
+            subject_class.save()
+
+            messages.success(request, f"Assigned {teacher.username} to {subject_class.class_name}")
+        except Exception as e:
+            messages.error(request, f"Error assigning teacher: {e}")
+
+    return redirect('manage_classes')  # make sure this matches your tab view name
 
 def assign_class_student(request):
     if request.method == 'POST':
-        # Logic for assigning a student to a class
-        pass
-    return render(request, 'assign_class_student.html')  # Placeholder template
+        class_id = request.POST.get('class_id')
+        student_id = request.POST.get('student_id')
 
+        try:
+            subject_class = Class.objects.get(id=class_id)
+            student = User.objects.get(id=student_id)
 
+            # Add the student to the class (Many-to-Many relationship)
+            subject_class.students.add(student)
+            subject_class.save()
+
+            messages.success(request, f"Assigned {student.username} to {subject_class.subject_name}")
+        except Exception as e:
+            messages.error(request, f"Error assigning student: {e}")
+
+    return redirect('manage_classes')  # Redirecting to manage_classes view
 
 
 def add_delete_admin(request):
@@ -730,3 +820,15 @@ def add_delete_admin(request):
     users = User.objects.filter(is_staff=True)
 
     return render(request, 'add_delete_admin.html', {'users': users})
+
+def class_detail(request, class_id):
+    # Fetch the class and related teacher
+    subject_class = get_object_or_404(Class, id=class_id)
+    teacher = subject_class.teacher  # This assumes 'teacher' is a ForeignKey in the Class model
+    students = subject_class.students.all()  # Assuming 'students' is a Many-to-Many relationship
+
+    return render(request, 'myapp/class_detail.html', {
+        'class': subject_class,
+        'teacher': teacher,
+        'students': students,
+    })

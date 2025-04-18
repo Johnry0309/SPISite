@@ -1,0 +1,39 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+
+{% block title %}Class Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Class Details</h2>
+  <a href="{% url 'manage_classes' %}" class="btn btn-secondary mb-3">← Back to Manage Classes</a>
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">{{ class.subject_name }} ({{ class.subject_code }})</h4>
+      <p><strong>Schedule:</strong> {{ class.schedule }}</p>
+      <p><strong>Duration:</strong> {{ class.duration }} minutes</p>
+      <p><strong>Room:</strong> {{ class.room }}</p>
+
+      <hr>
+      <h5>Assigned Teacher:</h5>
+      {% if teacher %}
+        <p>{{ teacher.username }}</p>
+      {% else %}
+        <p><em>No teacher assigned yet.</em></p>
+      {% endif %}
+
+      <hr>
+      <h5>Enrolled Students:</h5>
+      {% if students %}
+        <ul>
+          {% for student in students %}
+            <li>{{ student.username }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p><em>No students enrolled yet.</em></p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
