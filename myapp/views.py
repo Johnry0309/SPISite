@@ -629,6 +629,9 @@ def send_account_email(request, student_id):
 
     password = student.generated_password  # Assumes password is saved on creation
 
+    # Debugging: Print the password to the terminal
+    print(f"Generated password for {student.full_name} ({user.username}): {password}")
+
     subject = "🎓 You're Accepted! Your Student Account is Ready"
     from_email = settings.DEFAULT_FROM_EMAIL
     to_email = [student.email]
@@ -663,8 +666,6 @@ def send_account_email(request, student_id):
     student.email_sent = True
     student.save()
     return redirect('admin_dashboard')
-
-
 
 @login_required
 @user_passes_test(is_admin)
