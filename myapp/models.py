@@ -130,7 +130,7 @@ class Student(models.Model):
     previous_school = models.CharField(max_length=255, default="Unknown School")
     address = models.TextField(default="No Address Provided")
     status = models.CharField(max_length=50, default='pending')
-    generated_password = models.CharField(max_length=128, blank=True, null=True, default="password123")
+    generated_password = models.CharField(max_length=128, blank=True, null=True, default="samplepassword")
     email_sent = models.BooleanField(default=False)
 
     def __str__(self):

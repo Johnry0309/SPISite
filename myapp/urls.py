@@ -19,7 +19,8 @@ urlpatterns = [
     path('application_process/', views.application_process, name='application_process'),
     path('apply/', views.apply_online, name='apply_online'),
     path('class/<int:class_id>/', views.class_detail, name='class_detail'),
-    
+  
+
     # SPI Campuses
     path('spiantipolo/', views.spiantipolo, name='spiantipolo'),
     path('spiqc/', views.spiqc, name='spiqc'),
@@ -47,6 +48,7 @@ urlpatterns = [
     path('delete_image/<str:gallery_name>/<str:image_name>/', views.delete_image, name='delete_image'),
 
     # User Auth & Dashboard
+
     path('login/', views.login_view, name='login'),
     path('logout/', custom_logout, name='logout'),
     path('admin_login/', views.admin_login_view, name='admin_login'),
