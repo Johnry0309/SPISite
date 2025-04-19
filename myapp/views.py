@@ -14,8 +14,13 @@ from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
-from .models import Class, Announcement  # Assuming you have a Class model
-from django.http import HttpResponseForbidden
+from .models import Class, Announcement, Student  # Assuming you have a Class model
+from django.http import HttpResponseForbidden, Http404
+from django.core.mail import send_mail, EmailMultiAlternatives
+from django.utils.html import format_html
+import random
+import string
+
 
 
 
@@ -228,9 +233,6 @@ def upload_gallery_image(request):
         return redirect('admin_home')  # Redirect back after successful upload
 
     return render(request, 'admin_base.html')
-
-import os
-from django.conf import settings
 
 def gallery(request):
     galleries = {}
@@ -524,23 +526,177 @@ def delete_gallery(request, gallery_name):
 
     return redirect('gallery')
 
+
+
+
+
+def delete_application(request, application_id):
+    try:
+        # Check if the application exists
+        application = Application.objects.get(id=application_id)
+        
+        if request.method == 'POST':
+            # Proceed with deletion
+            application.delete()
+            return redirect('admin_dashboard')  # Redirect to your application list or home page
+
+    except Application.DoesNotExist:
+        # Handle the case where the application does not exist
+        raise Http404("Application not found.")
+    
+    # If not a POST request, render a confirmation page (optional)
+    return render(request, 'admin_dashboard', {'application': application})
+
+
+
+def generate_password(length=8):
+    # Define a more secure set of characters (excluding punctuation)
+    characters = string.ascii_letters + string.digits
+    password = ''.join(random.choice(characters) for _ in range(length))
+    return password
+
 @login_required
 @user_passes_test(is_admin)
 def accept_application(request, application_id):
     application = get_object_or_404(Application, pk=application_id)
-    application.status = 'accepted' # update application
-    application.save() # save it
-    messages.success(request, f"Application for {application.name} accepted.") # send a message to the screen
+
+    # Check if the application is already accepted
+    if application.status != 'accepted':
+        application.status = 'accepted'
+        application.save()
+
+        password = generate_password()  # Generate a temporary password
+
+        # Check if a student already exists for this application
+        if hasattr(application, 'student'):
+            # Student already exists, update their status
+            student = application.student
+            student.status = 'accepted'
+            student.generated_password = password  # Update password if necessary
+            student.save()
+            messages.success(request, f"{application.first_name}'s application has been accepted and student status updated.")
+        else:
+            # Create a new student if no student exists yet
+            base_username = application.email.split('@')[0]
+            username = base_username
+            counter = 1
+            while User.objects.filter(username=username).exists():
+                username = f"{base_username}{counter}"
+                counter += 1
+
+            # Create the User and save the password (hashing is done by create_user)
+            user = User.objects.create_user(
+                username=username,
+                email=application.email,
+                password=password,  # Plain password, hashing is handled by `create_user()`
+                first_name=application.first_name,
+                last_name=application.last_name
+            )
+            user.is_active = True
+            user.save()
+
+            # Create the student object
+            address = f"{application.house_number}, {application.street_name}, {application.barangay}, {application.city_municipality}, {application.province or ''}, {application.country}"
+            student = Student.objects.create(
+                application=application,
+                user=user,  # Link the student to the user
+                full_name=f"{application.first_name} {application.middle_name} {application.last_name}",
+                email=application.email,
+                contact_number=application.contact_number,
+                previous_school=application.previous_school,
+                address=address,
+                status='accepted',
+                generated_password=password  # Store the generated password for reference
+            )
+            messages.success(request, f"{application.first_name}'s application has been accepted. Student account created.")
+
+    else:
+        messages.warning(request, "This application has already been accepted.")
+
+    return redirect('admin_dashboard')  # Redirect to the admin dashboard after accepting
+
+def send_account_email(request, student_id):
+    student = get_object_or_404(Student, pk=student_id)
+    user = student.user
+    application = student.application
+
+    # Sync email from Application to Student and User
+    if application.email:
+        student.email = application.email
+        user.email = application.email
+        student.save()
+        user.save()
+
+    password = student.generated_password  # Assumes password is saved on creation
+
+    subject = "🎓 You're Accepted! Your Student Account is Ready"
+    from_email = settings.DEFAULT_FROM_EMAIL
+    to_email = [student.email]
+    login_url = 'https://spi.com/login/'  # Replace with actual URL
+
+    text_content = f"""
+    Dear {application.first_name},
+
+    Congratulations! Your application has been accepted.
+    Student ID: {user.username}
+    Temporary Password: {password}
+
+    Please log in at: {login_url}
+
+    Don't forget to visit the registrar's office to complete your enrollment.
+    """
+
+    html_content = f"""
+        <p>Dear <strong>{application.first_name}</strong>,</p>
+        <p>🎉 Congratulations! Your application has been <strong>accepted</strong>.</p>
+        <p>Your temporary student account has been created:</p>
+        <ul>
+            <li><strong>Student ID (Username):</strong> {user.username}</li>
+            <li><strong>Temporary Password:</strong> {password}</li>
+        </ul>
+
+        <p>👉 <a href="{login_url}" style="background-color: #4CAF50; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">Log in to your Student Portal</a></p>
+    """
+
+    send_mail(subject, text_content, from_email, to_email, html_message=html_content)
+    messages.success(request, f"Login credentials sent to {student.full_name}.")
+    student.email_sent = True
+    student.save()
     return redirect('admin_dashboard')
+
+
 
 @login_required
 @user_passes_test(is_admin)
 def reject_application(request, application_id):
-    application = get_object_or_404(Application, pk=application_id) # application id check
-    application.status = 'rejected' # changes the status to reject in case that exist
-    application.save()
-    messages.success(request, f"Application for {application.name} rejected.")#message to the screen
-    return redirect('admin_dashboard') # returns to the dashboard
+    application = get_object_or_404(Application, pk=application_id)  # Get the application by ID
+
+    if application.status != 'rejected':  # Only proceed if the application is not already rejected
+        application.status = 'rejected'
+        application.save()
+
+        # Check if a student exists for this application
+        if hasattr(application, 'student'):
+            # Student already exists, update their status to 'rejected'
+            student = application.student
+            student.status = 'rejected'
+            student.save()
+
+            # Optionally, deactivate the student account or take any other necessary actions
+            student.user.is_active = False  # Deactivate the student account
+            student.user.save()
+
+            messages.success(request, f"Application for {application.first_name} {application.last_name} has been rejected.")
+        else:
+            messages.success(request, f"Application for {application.first_name} {application.last_name} has been rejected, but no student was created yet.")
+
+    else:
+        messages.warning(request, "This application has already been rejected.")
+
+    return redirect('admin_dashboard')  # Redirect to the admin dashboard after rejecting
+
+
+
 @login_required
 @user_passes_test(is_admin)
 def admin_home(request):
@@ -570,16 +726,61 @@ def application_confirmation(request, application_id):
     context = {'application': application}
     return render(request, 'myapp/application_confirmation.html', context)
 
+from myapp.models import Student  # make sure this is imported
+
+from django.contrib.auth.models import User
+from django.contrib import messages
+
 def edit_application(request, application_id):
     application = get_object_or_404(Application, pk=application_id)
+    student = application.student if application.student else None
+    user = student.user if student else None
+
+    generated_password = student.generated_password if student else None
+    user_id = user.id if user else None
+
     if request.method == 'POST':
-        form = ApplicationForm(request.POST, instance=application)  # Use instance=application to update
-        if form.is_valid():
-            form.save()
-            return redirect('admin_dashboard')  # Or wherever you want to redirect
-    else:
-        form = ApplicationForm(instance=application)
-    return render(request, 'myapp/edit_application.html', {'form': form, 'application': application})
+        # Update Application fields
+        application.first_name = request.POST.get('first_name')
+        application.middle_name = request.POST.get('middle_name')
+        application.last_name = request.POST.get('last_name')
+        application.email = request.POST.get('email')
+        application.contact_number = request.POST.get('contact_number')
+        application.previous_school = request.POST.get('previous_school')
+        application.house_number = request.POST.get('house_number')
+        application.street_name = request.POST.get('street_name')
+        application.barangay = request.POST.get('barangay')
+        application.city_municipality = request.POST.get('city_municipality')
+        application.province = request.POST.get('province')
+        application.country = request.POST.get('country')
+        application.status = request.POST.get('status')
+        application.save()
+
+        # Update user and student fields
+        if student and user:
+            user.username = request.POST.get('username')
+            user.email = application.email
+            user.save()
+
+            student.email = application.email  # Sync student email
+
+            new_password = request.POST.get('password')
+            if new_password:
+                user.set_password(new_password)
+                user.save()
+                student.generated_password = new_password
+
+            student.save()  # Save once after all updates
+
+        messages.success(request, "Application updated successfully.")
+        return redirect('admin_dashboard')
+
+    return render(request, 'myapp/edit_application.html', {
+        'application': application,
+        'generated_password': generated_password,
+        'user_id': user_id
+    })
+
 
 def contact(request):
     if request.method == 'POST':
