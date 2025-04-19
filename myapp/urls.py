@@ -3,6 +3,7 @@ from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
+from .views import send_account_email
 
 from . import views
 from .views import upload_gallery_image, custom_logout, add_class
@@ -67,7 +68,7 @@ urlpatterns = [
     path('announcement/<int:id>/', views.announcement_detail, name='announcement_page'),
     path('delete_announcement/<int:pk>/', views.delete_announcement, name='delete_announcement'),
     path('announcement/<int:announcement_id>/', views.announcement_page, name='announcement_page'),
-
+    path('send-account-email/<int:student_id>/', send_account_email, name='send_account_email'),
  
  
     # Applications
@@ -75,6 +76,7 @@ urlpatterns = [
     path('accept_application/<int:application_id>/', views.accept_application, name='accept_application'),
     path('reject_application/<int:application_id>/', views.reject_application, name='reject_application'),
     path('application/edit/<int:application_id>/', views.edit_application, name='edit_application'),
+    path('delete_application/<int:application_id>/', views.delete_application, name='delete_application'),
 
     # Quick Links & Static Assets
     path('quick-links/', views.quick_links, name='quick_links'),

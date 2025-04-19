@@ -73,7 +73,7 @@ WSGI_APPLICATION = 'SPI.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',  # This is where your SQLite DB should be located
     }
 }
 
@@ -115,3 +115,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Redirect after login
 LOGIN_REDIRECT_URL = 'home'
+
+# settings.py
+
+# Basic email config (for Gmail, you can use SMTP)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Gmail SMTP server
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'johnryqadornado0309@gmail.com'  # Correctly formatted email address
+EMAIL_HOST_PASSWORD = 'tlzj isqj penl rtiy'  # Use the App Password here (16 characters)
+DEFAULT_FROM_EMAIL = 'Skill Power Institute <johnryqadornado0309@gmail.com>'
+

@@ -1,6 +1,3 @@
-# myapp/models.py
-from django.db import models
-from django.contrib.auth.models import User  # Import User if you link applications to user accounts
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -12,32 +9,29 @@ class Application(models.Model):
     ]
 
     first_name = models.CharField(max_length=255, default=" ")
-    middle_name = models.CharField(max_length=255,  default=" ")
-    last_name  = models.CharField(max_length=255, default=" ")
-    email = models.EmailField()
-    contact_number = models.CharField(max_length=15)
-    previous_school = models.CharField(max_length=255)
+    middle_name = models.CharField(max_length=255, default=" ")
+    last_name = models.CharField(max_length=255, default=" ")
+    email = models.EmailField(default="not_provided@example.com")
+    contact_number = models.CharField(max_length=15, default="0000000000")
+    previous_school = models.CharField(max_length=255, default="Unknown School")
 
-    # Address part
     house_number = models.CharField(max_length=100, default=" ")
     street_name = models.CharField(max_length=255, default=" ")
     barangay = models.CharField(max_length=255, default=" ")
     city_municipality = models.CharField(max_length=255, default=" ")
-    province = models.CharField(max_length=255, blank=True, null=True)  # Still optional
-    country = models.CharField(max_length=100, default=" ")
+    province = models.CharField(max_length=255, blank=True, null=True)
+    country = models.CharField(max_length=100, default="Philippines")
 
-    status = models.CharField(  # Status of Application
+    status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default='pending',
         help_text="Status of the application (Pending, Accepted, Rejected)"
     )
 
-    # Optional: Link to the User model if applications are associated with user accounts
-    applicant = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='applications')  # Optional
-    notes = models.TextField(blank=True)
+    applicant = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='applications')
+    notes = models.TextField(blank=True, default="")
 
-    # New field to store the application date
     application_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -46,7 +40,7 @@ class Application(models.Model):
     class Meta:
         verbose_name = "Application"
         verbose_name_plural = "Applications"
-        ordering = ['application_date']  # Default ordering of entries by application date
+        ordering = ['application_date']
 
 
 class ContactMessage(models.Model):
@@ -55,34 +49,33 @@ class ContactMessage(models.Model):
         ('resolved', 'Resolved'),
     )
 
-    name = models.CharField(max_length=100)
-    email = models.EmailField()
-    message = models.TextField()
+    name = models.CharField(max_length=100, default="Anonymous")
+    email = models.EmailField(default="not_provided@example.com")
+    message = models.TextField(default="No message provided.")
     timestamp = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
 
     def __str__(self):
         return f"Message from {self.name} ({self.email})"
-    
+
 
 class Subject(models.Model):
-    subject_code = models.CharField(max_length=20)
-    subject_name = models.CharField(max_length=100)
-    schedule = models.CharField(max_length=50)
-    duration = models.IntegerField()
-    room = models.CharField(max_length=20)
+    subject_code = models.CharField(max_length=20, default="N/A")
+    subject_name = models.CharField(max_length=100, default="Unnamed Subject")
+    schedule = models.CharField(max_length=50, default="TBA")
+    duration = models.IntegerField(default=60)  # fixed default type
+    room = models.CharField(max_length=20, default="Room 1")
 
     def __str__(self):
-        return f"{self.code} - {self.name}"
+        return f"{self.subject_code} - {self.subject_name}"
 
-from django.db import models
 
 class Class(models.Model):
-    subject_code = models.CharField(max_length=20)
-    subject_name = models.CharField(max_length=100)
-    schedule = models.CharField(max_length=100)
-    duration = models.IntegerField()
-    room = models.CharField(max_length=50)
+    subject_code = models.CharField(max_length=20, default="N/A")
+    subject_name = models.CharField(max_length=100, default="Unnamed Class")
+    schedule = models.CharField(max_length=100, default="TBA")
+    duration = models.IntegerField(default=60)
+    room = models.CharField(max_length=50, default="Room 1")
     teacher = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='teaching_classes')
     students = models.ManyToManyField(User, related_name='enrolled_classes', blank=True)
 
@@ -90,15 +83,15 @@ class Class(models.Model):
         return f"{self.subject_name} ({self.subject_code})"
 
 
-
 class TeacherProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=100)
-    middle_name = models.CharField(max_length=100, blank=True)
-    address = models.TextField(default="Not Provided")  # Default value for the new field
+    first_name = models.CharField(max_length=100, default="No First Name")
+    middle_name = models.CharField(max_length=100, blank=True, default="")
+    address = models.TextField(default="Not Provided")
 
     def __str__(self):
         return self.user.username
+
 
 class ClassAssignment(models.Model):
     assigned_class = models.ForeignKey(Class, on_delete=models.CASCADE)
@@ -107,29 +100,38 @@ class ClassAssignment(models.Model):
 
     def __str__(self):
         return f"{self.assigned_class} - {self.teacher}"
-    
+
+
 class Grade(models.Model):
-    student = models.ForeignKey('auth.User', on_delete=models.CASCADE)  # Assuming User is the student
-    course_name = models.CharField(max_length=255)
-    grade = models.CharField(max_length=10)
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    course_name = models.CharField(max_length=255, default="Untitled Course")
+    grade = models.CharField(max_length=10, default="N/A")
 
     def __str__(self):
         return f"{self.student.username} - {self.course_name}: {self.grade}"
-    
 
 
 class Announcement(models.Model):
-    title = models.CharField(max_length=200)
-    content = models.TextField()
-    image = models.ImageField(upload_to='announcements/', blank=True, null=True)  # Add this
-    created_at = models.DateTimeField(auto_now_add=True)  # ✅ Add this line
+    title = models.CharField(max_length=200, default="Untitled Announcement")
+    content = models.TextField(default="No content.")
+    image = models.ImageField(upload_to='announcements/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
-    
 
-class Subject(models.Model):
 
+class Student(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    application = models.OneToOneField(Application, on_delete=models.CASCADE)
+    full_name = models.CharField(max_length=255, default="Unnamed Student")
+    email = models.EmailField(default="student@example.com")
+    contact_number = models.CharField(max_length=15, default="0000000000")
+    previous_school = models.CharField(max_length=255, default="Unknown School")
+    address = models.TextField(default="No Address Provided")
+    status = models.CharField(max_length=50, default='pending')
+    generated_password = models.CharField(max_length=128, blank=True, null=True, default="password123")
+    email_sent = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.subject_name
+        return self.full_name
