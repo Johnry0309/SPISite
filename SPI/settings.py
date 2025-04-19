@@ -127,3 +127,4 @@ EMAIL_HOST_USER = 'johnryqadornado0309@gmail.com'  # Correctly formatted email a
 EMAIL_HOST_PASSWORD = 'tlzj isqj penl rtiy'  # Use the App Password here (16 characters)
 DEFAULT_FROM_EMAIL = 'Skill Power Institute <johnryqadornado0309@gmail.com>'
 
+CSRF_COOKIE_SECURE = False  # Disable for development (HTTP)

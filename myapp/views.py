@@ -1,25 +1,32 @@
+# Standard Libraries
+import random
+import string
 import os
+
+# Django Imports
 from django.conf import settings
-from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib import messages
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.core.files.storage import default_storage, FileSystemStorage
 from django.core.exceptions import ValidationError
-from django.utils.text import slugify
-from .models import Application, ContactMessage, TeacherProfile, Grade, Class, Subject
-from .forms import ApplicationForm, ContactForm, SubjectForm, ClassForm, AssignClassTeacherForm, AssignClassStudentForm, AddClassForm, AnnouncementForm
-from django.utils import timezone
-from django.utils.crypto import get_random_string
-from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
-from .models import Class, Announcement, Student  # Assuming you have a Class model
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden, Http404
-from django.core.mail import send_mail, EmailMultiAlternatives
+from django.utils import timezone
+from django.utils.text import slugify
+from django.utils.crypto import get_random_string
 from django.utils.html import format_html
-import random
-import string
+
+# Models
+from .models import Application, ContactMessage, TeacherProfile, Grade, Class, Subject, Announcement, Student
+
+# Forms
+from .forms import ApplicationForm, ContactForm, SubjectForm, ClassForm, AssignClassTeacherForm, AssignClassStudentForm, AddClassForm, AnnouncementForm
+
+# Django Auth Models
+from django.contrib.auth.models import User
 
 
 
@@ -288,27 +295,40 @@ def application_confirmation(request, application_id):
     return render(request, 'myapp/application_confirmation.html', {'application': application})
 
 # --- Login Views ---
+
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
-            user = authenticate(request, username=username, password=password) # Authentication with request argument
+
+            # Debugging: print the username and password entered
+            print(f"Login attempt with username: {username}, password: {password}")
+
+            # Authenticate the user
+            user = authenticate(request, username=username, password=password)
 
             if user is not None:
-                login(request, user)
-                messages.success(request, f"Welcome, {username}!")  # Add success message on login
-                return redirect('student_dashboard')
+                # Check if the user is active
+                if user.is_active:
+                    login(request, user)
+                    messages.success(request, f"Welcome, {username}!")  # Add success message on login
+                    return redirect('student_dashboard')  # Ensure this matches the correct URL name
+                else:
+                    messages.error(request, 'Your account is deactivated.')
+                    print("User account is deactivated.")
             else:
                 messages.error(request, 'Invalid username or password.')
+                print("Authentication failed.")
         else:
             messages.error(request, 'Invalid username or password.')
+            print(f"Form errors: {form.errors}")  # Log the form errors for debugging
 
     else:
         form = AuthenticationForm()
 
-    return render(request, 'login.html', {'form': form}) # Updated path
+    return render(request, 'login.html', {'form': form})
 
 @login_required(login_url='/login/')
 def teacher_dashboard(request):
@@ -572,8 +592,13 @@ def accept_application(request, application_id):
             # Student already exists, update their status
             student = application.student
             student.status = 'accepted'
-            student.generated_password = password  # Update password if necessary
-            student.save()
+            student.save()  # No need to update the password here
+
+            # Set the password for the user
+            user = student.user
+            user.set_password(password)  # Hashes the password properly
+            user.save()
+
             messages.success(request, f"{application.first_name}'s application has been accepted and student status updated.")
         else:
             # Create a new student if no student exists yet
@@ -606,7 +631,7 @@ def accept_application(request, application_id):
                 previous_school=application.previous_school,
                 address=address,
                 status='accepted',
-                generated_password=password  # Store the generated password for reference
+                generated_password=password,  # ✅ Save the generated password
             )
             messages.success(request, f"{application.first_name}'s application has been accepted. Student account created.")
 
@@ -615,21 +640,26 @@ def accept_application(request, application_id):
 
     return redirect('admin_dashboard')  # Redirect to the admin dashboard after accepting
 
+
 def send_account_email(request, student_id):
     student = get_object_or_404(Student, pk=student_id)
     user = student.user
     application = student.application
 
     # Sync email from Application to Student and User
-    if application.email:
+    if application.email and application.email != student.email:
         student.email = application.email
         user.email = application.email
         student.save()
         user.save()
 
-    password = student.generated_password  # Assumes password is saved on creation
+    # Ensure the password is stored in plain text for email
+    password = student.generated_password  # Ensure this is the plain text password
+    if not password:
+        messages.error(request, "Password not found for this student.")
+        return redirect('admin_dashboard')
 
-    # Debugging: Print the password to the terminal
+    # Debugging: Print the password to the terminal for troubleshooting
     print(f"Generated password for {student.full_name} ({user.username}): {password}")
 
     subject = "🎓 You're Accepted! Your Student Account is Ready"
@@ -650,21 +680,22 @@ def send_account_email(request, student_id):
     """
 
     html_content = f"""
-        <p>Dear <strong>{application.first_name}</strong>,</p>
-        <p>🎉 Congratulations! Your application has been <strong>accepted</strong>.</p>
-        <p>Your temporary student account has been created:</p>
-        <ul>
-            <li><strong>Student ID (Username):</strong> {user.username}</li>
-            <li><strong>Temporary Password:</strong> {password}</li>
-        </ul>
+    <p>Dear <strong>{application.first_name}</strong>,</p>
+    <p>🎉 Congratulations! Your application has been <strong>accepted</strong>.</p>
+    <p>Your temporary student account has been created:</p>
+    <ul>
+        <li><strong>Student ID (Username):</strong> {user.username}</li>
+        <li><strong>Temporary Password:</strong> {password}</li>
+    </ul>
 
-        <p>👉 <a href="{login_url}" style="background-color: #4CAF50; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">Log in to your Student Portal</a></p>
+    <p>👉 <a href="{login_url}" style="background-color: #4CAF50; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">Log in to your Student Portal</a></p>
     """
 
     send_mail(subject, text_content, from_email, to_email, html_message=html_content)
     messages.success(request, f"Login credentials sent to {student.full_name}.")
     student.email_sent = True
     student.save()
+
     return redirect('admin_dashboard')
 
 @login_required
@@ -727,10 +758,7 @@ def application_confirmation(request, application_id):
     context = {'application': application}
     return render(request, 'myapp/application_confirmation.html', context)
 
-from myapp.models import Student  # make sure this is imported
 
-from django.contrib.auth.models import User
-from django.contrib import messages
 
 def edit_application(request, application_id):
     application = get_object_or_404(Application, pk=application_id)
