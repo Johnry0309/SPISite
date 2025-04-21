@@ -62,7 +62,7 @@ class ContactMessage(models.Model):
 class Subject(models.Model):
     subject_code = models.CharField(max_length=20, default="N/A")
     subject_name = models.CharField(max_length=100, default="Unnamed Subject")
-    schedule = models.CharField(max_length=50, default="TBA")
+    prerequisite = models.CharField(max_length=50, default="none")
     duration = models.IntegerField(default=60)  # fixed default type
     room = models.CharField(max_length=20, default="Room 1")
 
@@ -71,9 +71,9 @@ class Subject(models.Model):
 
 
 class Class(models.Model):
-    subject_code = models.CharField(max_length=20, default="N/A")
-    subject_name = models.CharField(max_length=100, default="Unnamed Class")
-    schedule = models.CharField(max_length=100, default="TBA")
+    subject_code = models.CharField(max_length=20, default="ex: SHSCO 01")
+    subject_name = models.CharField(max_length=100, default="ex: Oral Communication")
+    prerequisite = models.CharField(max_length=100, default="none")
     duration = models.IntegerField(default=60)
     room = models.CharField(max_length=50, default="Room 1")
     teacher = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='teaching_classes')

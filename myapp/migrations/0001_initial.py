@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('subject_code', models.CharField(default='N/A', max_length=20)),
                 ('subject_name', models.CharField(default='Unnamed Subject', max_length=100)),
-                ('schedule', models.CharField(default='TBA', max_length=50)),
+                ('prerequisite', models.CharField(default='TBA', max_length=50)),
                 ('duration', models.IntegerField(default=60)),
                 ('room', models.CharField(default='Room 1', max_length=20)),
             ],

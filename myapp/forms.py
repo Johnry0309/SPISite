@@ -121,7 +121,7 @@ class AssignClassStudentForm(forms.ModelForm):
 class AddClassForm(forms.Form):
     subject_code = forms.CharField(max_length=10, label='Subject Code', required=True)
     subject_name = forms.CharField(max_length=100, label='Subject Description', required=True)
-    schedule = forms.CharField(max_length=50, label='Schedule', required=True, help_text='e.g. MWF 10:00-11:00')
+    prerequisite = forms.CharField(max_length=50, label='prerequisite', required=True, help_text='e.g. MWF 10:00-11:00')
     duration = forms.IntegerField(label='Duration (in hrs)', required=True)
     room = forms.CharField(max_length=10, label='Room', required=True)
 
