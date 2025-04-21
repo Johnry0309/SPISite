@@ -40,16 +40,16 @@
         <input type="text" class="form-control" name="subject_name" required>
       </div>
       <div class="mb-3">
-        <label for="schedule" class="form-label">Schedule</label>
-        <input type="text" class="form-control" name="schedule" placeholder="e.g. MWF 10:00-11:00" required>
+        <label for="prerequisite" class="form-label">Prerequisite</label>
+        <input type="text" class="form-control" name="prerequisite" placeholder="none" required>
       </div>
       <div class="mb-3">
-        <label for="duration" class="form-label">Duration (in minutes)</label>
+        <label for="duration" class="form-label">Duration per week(in hrs)</label>
         <input type="number" class="form-control" name="duration" required>
       </div>
       <div class="mb-3">
         <label for="room" class="form-label">Room</label>
-        <input type="text" class="form-control" name="room" required>
+        <input type="text" class="form-control" name="room" placeholder="TBA" required>
       </div>
       <button type="submit" name="add_class" class="btn btn-primary">Add Subject/Class</button>
     </form>
@@ -61,8 +61,8 @@
         <tr>
           <th>Subject Code</th>
           <th>Subject Name</th>
-          <th>Schedule</th>
-          <th>Duration</th>
+          <th>Prerequisite</th>
+          <th>Duration per Week</th>
           <th>Room</th>
           <th>Action</th>
         </tr>
@@ -76,8 +76,8 @@
             <td>
               <a href="{% url 'class_detail' class.id %}">{{ class.subject_name }}</a>
             </td>
-            <td>{{ class.schedule }}</td>
-            <td>{{ class.duration }} minutes</td>
+            <td>{{ class.prerequisite }}</td>
+            <td>{{ class.duration }} hr/s</td>
             <td>{{ class.room }}</td>
             <td>
               <form method="POST" action="{% url 'delete_class' class.id %}" onsubmit="return confirm('Are you sure you want to delete this class?');">
@@ -135,7 +135,7 @@
         <label for="student_id" class="form-label">Select Student</label>
         <select name="student_id" class="form-select" required>
           {% for student in students %}
-            <option value="{{ student.id }}">{{ student.username }}</option>
+            <option value="{{ student.id }}">{{ student.first_name }}{{ student.middle_name }}{{ student.last_name }}</option>
           {% endfor %}
         </select>
       </div>

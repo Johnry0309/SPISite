@@ -82,7 +82,7 @@ def add_class(request):
             Class.objects.create(
                 subject_code=form.cleaned_data['subject_code'],
                 subject_name=form.cleaned_data['subject_name'],
-                schedule=form.cleaned_data['schedule'],
+                prerequisite=form.cleaned_data['prerequisite'],
                 duration=form.cleaned_data['duration'],
                 room=form.cleaned_data['room']
             )
@@ -882,15 +882,15 @@ def manage_classes(request):
         if 'add_class' in request.POST:
             subject_code = request.POST.get('subject_code')
             subject_name = request.POST.get('subject_name')
-            schedule = request.POST.get('schedule')
+            prerequisite = request.POST.get('prerequisite')
             duration = request.POST.get('duration')
             room = request.POST.get('room')
 
-            if all([subject_code, subject_name, schedule, duration, room]):
+            if all([subject_code, subject_name, prerequisite, duration, room]):
                 Class.objects.create(
                     subject_code=subject_code,
                     subject_name=subject_name,
-                    schedule=schedule,
+                    prerequisite=prerequisite,
                     duration=duration,
                     room=room
                 )
