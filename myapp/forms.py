@@ -125,7 +125,13 @@ class AddClassForm(forms.Form):
     duration = forms.IntegerField(label='Duration (in hrs)', required=True)
     room = forms.CharField(max_length=10, label='Room', required=True)
 
-
+class AddClassGroupForm(forms.Form):
+    name = forms.CharField(max_length=100, label='Group Name', required=True)
+    classes = forms.ModelMultipleChoiceField(
+        queryset=Class.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=True
+    )
 
 
 class AnnouncementForm(forms.ModelForm):

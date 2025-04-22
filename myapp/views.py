@@ -2,6 +2,7 @@
 import random
 import string
 import os
+import json
 
 # Django Imports
 from django.conf import settings
@@ -20,7 +21,7 @@ from django.utils.crypto import get_random_string
 from django.utils.html import format_html
 
 # Models
-from .models import Application, ContactMessage, TeacherProfile, Grade, Class, Subject, Announcement, Student
+from .models import Application, ContactMessage, TeacherProfile, Grade, Class, Subject, Announcement, Student, ClassGroup 
 
 # Forms
 from .forms import ApplicationForm, ContactForm, SubjectForm, ClassForm, AssignClassTeacherForm, AssignClassStudentForm, AddClassForm, AnnouncementForm
@@ -872,9 +873,14 @@ def delete_message(request, message_id):
 
 # admin class management
 
+from .models import Class, ClassGroup  # Make sure ClassGroup is imported
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
 
 def manage_classes(request):
     classes = Class.objects.all()
+    class_groups = ClassGroup.objects.prefetch_related('classes').all()
     teachers = User.objects.filter(is_staff=True, is_superuser=False)
     students = User.objects.filter(is_staff=False)
 
@@ -895,9 +901,9 @@ def manage_classes(request):
                     room=room
                 )
                 messages.success(request, 'Class added successfully.')
-                return redirect('manage_classes')
             else:
                 messages.error(request, 'Please fill in all fields.')
+            return redirect('manage_classes')
 
         elif 'assign_teacher' in request.POST:
             class_id = request.POST.get('class_id')
@@ -920,14 +926,49 @@ def manage_classes(request):
             try:
                 class_obj = Class.objects.get(id=class_id)
                 student = User.objects.get(id=student_id)
-                class_obj.students.add(student)  # assuming ManyToManyField to User for students
+                class_obj.students.add(student)
                 messages.success(request, 'Class assigned to student.')
+            except Exception as e:
+                messages.error(request, f'Error: {e}')
+            return redirect('manage_classes')
+
+        elif 'add_group' in request.POST:
+            group_name = request.POST.get('group_name')
+            class_ids_json = request.POST.get('group_classes_json')
+
+            try:
+                class_ids = json.loads(class_ids_json)
+            except (TypeError, json.JSONDecodeError):
+                class_ids = []
+
+            if group_name and class_ids:
+                try:
+                    group = ClassGroup.objects.create(name=group_name)
+                    group.classes.set(Class.objects.filter(id__in=class_ids))
+                    messages.success(request, 'Class group created successfully.')
+                except Exception as e:
+                    messages.error(request, f'Error: {e}')
+            else:
+                messages.error(request, 'Please provide a group name and select at least one class.')
+            return redirect('manage_classes')
+
+        elif 'assign_group_to_student' in request.POST:
+            student_id = request.POST.get('student_id')
+            group_id = request.POST.get('group_id')
+
+            try:
+                student = User.objects.get(id=student_id)
+                group = ClassGroup.objects.get(id=group_id)
+                for class_obj in group.classes.all():
+                    class_obj.students.add(student)
+                messages.success(request, f'{group.name} assigned to student.')
             except Exception as e:
                 messages.error(request, f'Error: {e}')
             return redirect('manage_classes')
 
     return render(request, 'myapp/manage_classes.html', {
         'classes': classes,
+        'class_groups': class_groups,
         'teachers': teachers,
         'students': students,
     })

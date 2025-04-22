@@ -135,3 +135,10 @@ class Student(models.Model):
 
     def __str__(self):
         return self.full_name
+
+class ClassGroup(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    classes = models.ManyToManyField(Class, related_name='groups')
+
+    def __str__(self):
+        return self.name

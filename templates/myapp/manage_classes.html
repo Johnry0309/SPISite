@@ -12,6 +12,9 @@
     <button class="nav-link active" id="add-class-tab" data-bs-toggle="tab" data-bs-target="#add-class" type="button" role="tab">Add Subject/Class</button>
   </li>
   <li class="nav-item" role="presentation">
+    <button class="nav-link" id="group-classes-tab" data-bs-toggle="tab" data-bs-target="#group-classes" type="button" role="tab">Group Classes</button>
+  </li>
+  <li class="nav-item" role="presentation">
     <button class="nav-link" id="assign-teacher-tab" data-bs-toggle="tab" data-bs-target="#assign-teacher" type="button" role="tab">Assign Class to Teacher</button>
   </li>
   <li class="nav-item" role="presentation">
@@ -70,12 +73,8 @@
       <tbody>
         {% for class in classes %}
           <tr>
-            <td>
-              <a href="{% url 'class_detail' class.id %}">{{ class.subject_code }}</a>
-            </td>
-            <td>
-              <a href="{% url 'class_detail' class.id %}">{{ class.subject_name }}</a>
-            </td>
+            <td><a href="{% url 'class_detail' class.id %}">{{ class.subject_code }}</a></td>
+            <td><a href="{% url 'class_detail' class.id %}">{{ class.subject_name }}</a></td>
             <td>{{ class.prerequisite }}</td>
             <td>{{ class.duration }} hr/s</td>
             <td>{{ class.room }}</td>
@@ -93,6 +92,54 @@
         {% endfor %}
       </tbody>
     </table>
+  </div>
+
+  <!-- Group Classes -->
+  <div class="tab-pane fade" id="group-classes" role="tabpanel">
+    <h5>Create Class Group</h5>
+    <form method="POST" action=".">
+      {% csrf_token %}
+      
+      <div class="mb-3 d-flex gap-2">
+        <select id="select_class_to_add" class="form-select" onchange="enableAddButton()">
+          <option value="" selected disabled>Select a subject to add</option>
+          {% for class in classes %}
+            <option value="{{ class.id }}" data-name="{{ class.subject_name }} ({{ class.subject_code }})">
+              {{ class.subject_name }} ({{ class.subject_code }})
+            </option>
+          {% endfor %}
+        </select>
+        <button type="button" id="addClassBtn" class="btn btn-secondary" disabled onclick="addClassToList()">Add</button>
+      </div>
+
+      <ul id="selectedClassList" class="list-group mb-3"></ul>
+      <input type="hidden" name="group_classes_json" id="group_classes_json">
+
+      <div class="mb-3">
+        <label for="group_name" class="form-label">Group Name</label>
+        <input type="text" class="form-control" name="group_name" required>
+      </div>
+
+      <button type="submit" name="add_group" class="btn btn-warning">Create Group</button>
+    </form>
+
+    <hr>
+
+    <h5 class="mt-4">Existing Class Groups</h5>
+    <ul class="list-group">
+      {% for group in class_groups %}
+        <li class="list-group-item">
+          <strong>{{ group.name }}</strong>
+          <ul class="mb-0">
+            {% for class in group.classes.all %}
+              <li>{{ class.subject_name }} ({{ class.subject_code }})</li>
+            {% endfor %}
+          </ul>
+        </li>
+      {% empty %}
+        <li class="list-group-item text-muted">No groups created yet.</li>
+      {% endfor %}
+    </ul>
   </div>
 
   <!-- Assign Class to Teacher -->
@@ -135,13 +182,84 @@
         <label for="student_id" class="form-label">Select Student</label>
         <select name="student_id" class="form-select" required>
           {% for student in students %}
-            <option value="{{ student.id }}">{{ student.first_name }}{{ student.middle_name }}{{ student.last_name }}</option>
+            <option value="{{ student.id }}">{{ student.first_name }} {{ student.middle_name }} {{ student.last_name }}</option>
           {% endfor %}
         </select>
       </div>
       <button type="submit" name="assign_student" class="btn btn-info">Assign to Student</button>
     </form>
-  </div>
 
-</div>
+    <hr class="my-4">
+
+    <h5>Assign Class Group to Student</h5>
+    <form method="POST" action=".">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label for="group_id" class="form-label">Select Class Group</label>
+        <select name="group_id" class="form-select" required>
+          {% for group in class_groups %}
+            <option value="{{ group.id }}">{{ group.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="student_id" class="form-label">Select Student</label>
+        <select name="student_id" class="form-select" required>
+          {% for student in students %}
+            <option value="{{ student.id }}">{{ student.first_name }} {{ student.middle_name }} {{ student.last_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" name="assign_group_to_student" class="btn btn-dark">Assign Group to Student</button>
+    </form>
+  </div>
+</div> <!-- ✅ Properly closes tab-content -->
+
+<script>
+  const selectedClassList = document.getElementById("selectedClassList");
+  const classIds = [];
+  const classNames = [];
+
+  function enableAddButton() {
+    document.getElementById("addClassBtn").disabled = false;
+  }
+
+  function addClassToList() {
+    const select = document.getElementById("select_class_to_add");
+    const selectedOption = select.options[select.selectedIndex];
+    const classId = selectedOption.value;
+    const className = selectedOption.dataset.name;
+
+    if (classIds.includes(classId)) {
+      alert("This class is already added.");
+      return;
+    }
+
+    classIds.push(classId);
+    classNames.push(className);
+    document.getElementById("group_classes_json").value = JSON.stringify(classIds);
+
+    const listItem = document.createElement("li");
+    listItem.className = "list-group-item d-flex justify-content-between align-items-center";
+    listItem.textContent = className;
+
+    const removeBtn = document.createElement("button");
+    removeBtn.className = "btn btn-sm btn-danger";
+    removeBtn.textContent = "Remove";
+    removeBtn.onclick = () => {
+      const index = classIds.indexOf(classId);
+      classIds.splice(index, 1);
+      classNames.splice(index, 1);
+      listItem.remove();
+      document.getElementById("group_classes_json").value = JSON.stringify(classIds);
+    };
+
+    listItem.appendChild(removeBtn);
+    selectedClassList.appendChild(listItem);
+    select.remove(select.selectedIndex);
+    select.selectedIndex = 0;
+    document.getElementById("addClassBtn").disabled = true;
+  }
+</script>
+
 {% endblock %}
