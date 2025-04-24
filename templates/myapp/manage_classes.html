@@ -184,7 +184,7 @@
         <label for="class_id" class="form-label">Select Class</label>
         <select name="class_id" class="form-select" required>
           {% for class in classes %}
-            <option value="{{ class.id }}">{{ class.subject_name }} ({{ class.subject_code }})</option>
+            <option value="{{ class.id }}">{{ class.subject_code }} ({{ class.subject_name }})</option>
           {% endfor %}
         </select>
       </div>
@@ -208,7 +208,7 @@
         <label for="class_id" class="form-label">Select Class</label>
         <select name="class_id" class="form-select" required>
           {% for class in classes %}
-            <option value="{{ class.id }}">{{ class.subject_name }} ({{ class.subject_code }})</option>
+            <option value="{{ class.id }}">{{ class.subject_code }} ({{ class.subject_name }})</option>
           {% endfor %}
         </select>
       </div>
@@ -216,7 +216,7 @@
         <label for="student_id" class="form-label">Select Student</label>
         <select name="student_id" class="form-select" required>
           {% for student in students %}
-            <option value="{{ student.id }}">{{ student.first_name }} {{ student.middle_name }} {{ student.last_name }}</option>
+            <option value="{{ student.id }}">{{ student.last_name }}, {{ student.first_name }} {{ student.middle_name }} </option>
           {% endfor %}
         </select>
       </div>
