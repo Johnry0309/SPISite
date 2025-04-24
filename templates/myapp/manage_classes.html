@@ -94,34 +94,68 @@
     </table>
   </div>
 
-  <!-- Group Classes -->
-  <div class="tab-pane fade" id="group-classes" role="tabpanel">
-    <h5>Create Class Group</h5>
-    <form method="POST" action=".">
-      {% csrf_token %}
-      
-      <div class="mb-3 d-flex gap-2">
-        <select id="select_class_to_add" class="form-select" onchange="enableAddButton()">
-          <option value="" selected disabled>Select a subject to add</option>
-          {% for class in classes %}
-            <option value="{{ class.id }}" data-name="{{ class.subject_name }} ({{ class.subject_code }})">
-              {{ class.subject_name }} ({{ class.subject_code }})
-            </option>
-          {% endfor %}
-        </select>
-        <button type="button" id="addClassBtn" class="btn btn-secondary" disabled onclick="addClassToList()">Add</button>
-      </div>
+<!-- Group Classes -->
+<div class="tab-pane fade" id="group-classes" role="tabpanel">
+  <h5>Create Class Group</h5>
+  <form method="POST" action=".">
+    {% csrf_token %}
 
-      <ul id="selectedClassList" class="list-group mb-3"></ul>
-      <input type="hidden" name="group_classes_json" id="group_classes_json">
+    <div class="mb-3 d-flex gap-2">
+      <select id="select_class_to_add" class="form-select" onchange="enableAddButton()">
+        <option value="" selected disabled>Select a subject to add</option>
+        {% for class in classes %}
+          <option value="{{ class.id }}" data-name="{{ class.subject_name }} ({{ class.subject_code }})">
+            {{ class.subject_name }} ({{ class.subject_code }})
+          </option>
+        {% endfor %}
+      </select>
+      <button type="button" id="addClassBtn" class="btn btn-secondary" disabled onclick="addClassToList()">Add</button>
+    </div>
 
-      <div class="mb-3">
-        <label for="group_name" class="form-label">Group Name</label>
-        <input type="text" class="form-control" name="group_name" required>
-      </div>
+    <ul id="selectedClassList" class="list-group mb-3"></ul>
+    <input type="hidden" name="group_classes_json" id="group_classes_json">
 
-      <button type="submit" name="add_group" class="btn btn-warning">Create Group</button>
-    </form>
+    <div class="mb-3">
+      <label for="group_name" class="form-label">Group Name</label>
+      <input type="text" class="form-control" name="group_name" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="strand" class="form-label">Strand</label>
+      <select class="form-select" name="strand" required>
+        <option value="" disabled selected>Select strand</option>
+        <option value="ABM">ABM</option>
+        <option value="GAS">GAS</option>
+        <option value="HUMMS">HUMMS</option>
+        <option value="HRM">HRM</option>
+        <option value="TM">Tourism Management</option>
+        <option value="ICT">Information and Communication Technology</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="semester" class="form-label">Semester</label>
+      <select class="form-select" name="semester" required>
+        <option value="" disabled selected>Select semester</option>
+        <option value="1">1st Semester</option>
+        <option value="2">2nd Semester</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="level" class="form-label">Student Level</label>
+      <select class="form-select" name="level" required>
+        <option value="" disabled selected>Select level</option>
+        <option value="HS11">Senior High School Grade 11</option>
+        <option value="HS12">Senior High School Grade 12</option>
+        <option value="COL">College</option>
+      </select>
+    </div>
+
+    <button type="submit" name="add_group" class="btn btn-warning">Create Group</button>
+  </form>
+
+
 
     <hr>
 

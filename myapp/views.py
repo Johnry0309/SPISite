@@ -873,10 +873,6 @@ def delete_message(request, message_id):
 
 # admin class management
 
-from .models import Class, ClassGroup  # Make sure ClassGroup is imported
-from django.contrib import messages
-from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
 
 def manage_classes(request):
     classes = Class.objects.all()
@@ -935,21 +931,29 @@ def manage_classes(request):
         elif 'add_group' in request.POST:
             group_name = request.POST.get('group_name')
             class_ids_json = request.POST.get('group_classes_json')
+            strand = request.POST.get('strand')
+            semester = request.POST.get('semester')
+            level = request.POST.get('level')
 
             try:
                 class_ids = json.loads(class_ids_json)
             except (TypeError, json.JSONDecodeError):
                 class_ids = []
 
-            if group_name and class_ids:
+            if group_name and class_ids and strand and semester and level:
                 try:
-                    group = ClassGroup.objects.create(name=group_name)
+                    group = ClassGroup.objects.create(
+                        name=group_name,
+                        strand=strand,
+                        semester=semester,
+                        level=level
+                    )
                     group.classes.set(Class.objects.filter(id__in=class_ids))
                     messages.success(request, 'Class group created successfully.')
                 except Exception as e:
                     messages.error(request, f'Error: {e}')
             else:
-                messages.error(request, 'Please provide a group name and select at least one class.')
+                messages.error(request, 'Please fill in all group details.')
             return redirect('manage_classes')
 
         elif 'assign_group_to_student' in request.POST:
