@@ -136,9 +136,33 @@ class Student(models.Model):
     def __str__(self):
         return self.full_name
 
+
 class ClassGroup(models.Model):
+    STRAND_CHOICES = [
+        ('ABM', 'ABM'),
+        ('GAS', 'GAS'),
+        ('HUMMS', 'HUMMS'),
+        ('HRM', 'HRM'),
+        ('TM', 'Tourism Management'),
+        ('ICT', 'Information and Communication Technology'),
+    ]
+
+    SEMESTER_CHOICES = [
+        ('1', '1st Semester'),
+        ('2', '2nd Semester'),
+    ]
+
+    LEVEL_CHOICES = [
+        ('HS11', 'Senior High School Grade 11'),
+        ('HS12', 'Senior High School Grade 12'),
+        ('COL', 'College'),
+    ]
+
     name = models.CharField(max_length=100, unique=True)
-    classes = models.ManyToManyField(Class, related_name='groups')
+    classes = models.ManyToManyField('Class', related_name='groups')
+    strand = models.CharField(max_length=10, choices=STRAND_CHOICES, default='GAS')
+    semester = models.CharField(max_length=1, choices=SEMESTER_CHOICES, default='1')
+    level = models.CharField(max_length=4, choices=LEVEL_CHOICES, default='HS11')
 
     def __str__(self):
-        return self.name
+        return f"{self.name} - {self.get_strand_display()} - {self.get_level_display()} - {self.get_semester_display()}"
