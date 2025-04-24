@@ -53,6 +53,23 @@
                     {% endif %}
                 </div>
             </div>
+            <!-- Level Selection -->
+            <div class="mb-3">
+                <label for="{{ form.level.id_for_label }}" class="form-label">Level:</label>
+                {{ form.level|add_class:"form-control" }}
+                {% if form.level.errors %}
+                    <div class="text-danger">{% for error in form.level.errors %}{{ error }}{% endfor %}</div>
+                {% endif %}
+            </div>
+
+            <!-- Strand Selection -->
+            <div class="mb-3">
+                <label for="{{ form.strand.id_for_label }}" class="form-label">Strand:</label>
+                {{ form.strand|add_class:"form-control" }}
+                {% if form.strand.errors %}
+                    <div class="text-danger">{% for error in form.strand.errors %}{{ error }}{% endfor %}</div>
+                {% endif %}
+            </div>
 
             <!-- Address Section -->
             <h5 class="mt-4">Address Information</h5>

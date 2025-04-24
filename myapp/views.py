@@ -581,28 +581,23 @@ def generate_password(length=8):
 def accept_application(request, application_id):
     application = get_object_or_404(Application, pk=application_id)
 
-    # Check if the application is already accepted
     if application.status != 'accepted':
         application.status = 'accepted'
         application.save()
 
-        password = generate_password()  # Generate a temporary password
+        password = generate_password()
 
-        # Check if a student already exists for this application
         if hasattr(application, 'student'):
-            # Student already exists, update their status
             student = application.student
             student.status = 'accepted'
-            student.save()  # No need to update the password here
+            student.save()
 
-            # Set the password for the user
             user = student.user
-            user.set_password(password)  # Hashes the password properly
+            user.set_password(password)
             user.save()
 
             messages.success(request, f"{application.first_name}'s application has been accepted and student status updated.")
         else:
-            # Create a new student if no student exists yet
             base_username = application.email.split('@')[0]
             username = base_username
             counter = 1
@@ -610,36 +605,43 @@ def accept_application(request, application_id):
                 username = f"{base_username}{counter}"
                 counter += 1
 
-            # Create the User and save the password (hashing is done by create_user)
             user = User.objects.create_user(
                 username=username,
                 email=application.email,
-                password=password,  # Plain password, hashing is handled by `create_user()`
+                password=password,
                 first_name=application.first_name,
                 last_name=application.last_name
             )
             user.is_active = True
             user.save()
 
-            # Create the student object
             address = f"{application.house_number}, {application.street_name}, {application.barangay}, {application.city_municipality}, {application.province or ''}, {application.country}"
             student = Student.objects.create(
                 application=application,
-                user=user,  # Link the student to the user
+                user=user,
                 full_name=f"{application.first_name} {application.middle_name} {application.last_name}",
                 email=application.email,
                 contact_number=application.contact_number,
                 previous_school=application.previous_school,
                 address=address,
                 status='accepted',
-                generated_password=password,  # ✅ Save the generated password
+                generated_password=password,
             )
-            messages.success(request, f"{application.first_name}'s application has been accepted. Student account created.")
 
+            # 🔄 Auto-assign class group
+            class_groups = ClassGroup.objects.filter(
+                strand=application.strand,
+                level=application.level
+            )
+            for group in class_groups:
+                for class_obj in group.classes.all():
+                    class_obj.students.add(user)
+
+            messages.success(request, f"{application.first_name}'s application has been accepted. Student account created and class group assigned.")
     else:
         messages.warning(request, "This application has already been accepted.")
 
-    return redirect('admin_dashboard')  # Redirect to the admin dashboard after accepting
+    return redirect('admin_dashboard')
 
 
 def send_account_email(request, student_id):

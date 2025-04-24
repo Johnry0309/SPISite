@@ -8,6 +8,21 @@ class Application(models.Model):
         ('rejected', 'Rejected'),
     ]
 
+    STRAND_CHOICES = [
+        ('ABM', 'ABM'),
+        ('GAS', 'GAS'),
+        ('HUMMS', 'HUMMS'),
+        ('HRM', 'HRM'),
+        ('TM', 'TM'),
+        ('ICT', 'ICT'),
+    ]
+
+    LEVEL_CHOICES = [
+        ('HS11', 'High School Grade 11'),
+        ('HS12', 'High School Grade 12'),
+        ('COL', 'College'),
+    ]
+
     first_name = models.CharField(max_length=255, default=" ")
     middle_name = models.CharField(max_length=255, default=" ")
     last_name = models.CharField(max_length=255, default=" ")
@@ -21,6 +36,20 @@ class Application(models.Model):
     city_municipality = models.CharField(max_length=255, default=" ")
     province = models.CharField(max_length=255, blank=True, null=True)
     country = models.CharField(max_length=100, default="Philippines")
+
+    strand = models.CharField(
+        max_length=10,
+        choices=STRAND_CHOICES,
+        default='GAS',
+        help_text="Strand for which the student is applying"
+    )
+
+    level = models.CharField(
+        max_length=10,
+        choices=LEVEL_CHOICES,
+        default='HS11',
+        help_text="Level of the student (HS11, HS12, COL)"
+    )
 
     status = models.CharField(
         max_length=20,

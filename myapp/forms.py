@@ -6,10 +6,11 @@ class ApplicationForm(forms.ModelForm):
     class Meta:
         model = Application
         fields = [
-            'first_name','middle_name','last_name', 'email', 'contact_number', 'previous_school',
-            'house_number', 'street_name', 'barangay',
-            'city_municipality', 'province', 'country'
+            'first_name', 'middle_name', 'last_name', 'email', 'contact_number', 'previous_school',
+            'house_number', 'street_name', 'barangay', 'city_municipality', 'province', 'country',
+            'strand', 'level'
         ]
+
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
             'middle_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -23,8 +24,11 @@ class ApplicationForm(forms.ModelForm):
             'city_municipality': forms.TextInput(attrs={'class': 'form-control'}),
             'province': forms.TextInput(attrs={'class': 'form-control'}),
             'country': forms.TextInput(attrs={'class': 'form-control'}),
+            'strand': forms.Select(attrs={'class': 'form-control'}),
+            'level': forms.Select(attrs={'class': 'form-control'}),
         }
 
+    # Custom field validation
     def clean_first_name(self):
         return self.validate_not_empty(self.cleaned_data.get("first_name"), "First Name")
     
@@ -32,7 +36,7 @@ class ApplicationForm(forms.ModelForm):
         return self.validate_not_empty(self.cleaned_data.get("middle_name"), "Middle Name")
     
     def clean_last_name(self):
-        return self.validate_not_empty(self.cleaned_data.get("last_name"), "Last_Name")
+        return self.validate_not_empty(self.cleaned_data.get("last_name"), "Last Name")
 
     def clean_previous_school(self):
         return self.validate_not_empty(self.cleaned_data.get("previous_school"), "Previous School")
