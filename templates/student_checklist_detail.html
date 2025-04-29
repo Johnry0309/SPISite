@@ -1,0 +1,30 @@
+{% load custom_filters %}
+
+<div class="card mt-4" id="checklist-card">
+    <div class="card-header">
+        <h5>Document Checklist for {{ student.full_name }}</h5>
+    </div>
+    <div class="card-body">
+        {% if status_message %}
+            <div class="alert alert-info">
+                {{ status_message }}
+            </div>
+        {% endif %}
+        
+        <form id="document-form">
+            {% csrf_token %}
+            <input type="hidden" name="student_id" value="{{ student.id }}">
+            {% for field in checklist_fields %}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="{{ field }}" {% if student|get_attr:field %}checked{% endif %}>
+                    <label class="form-check-label">{{ field|replace_underscores }}</label>
+                </div>
+            {% endfor %}
+            
+            <button type="button" class="btn btn-success mt-3" onclick="submitChecklist({{ student.id }})">Save Checklist</button>
+            <button type="button" class="btn btn-primary mt-3 ms-2" onclick="enrollStudent({{ student.id }})">Enroll Student</button>
+            
+            <p id="checklist-message" class="mt-2 text-success" style="display: none;">Checklist saved!</p>
+        </form>
+    </div>
+</div>
