@@ -161,6 +161,18 @@ class Student(models.Model):
     status = models.CharField(max_length=50, default='pending')
     generated_password = models.CharField(max_length=128, blank=True, null=True, default="samplepassword")
     email_sent = models.BooleanField(default=False)
+    strand = models.CharField(max_length=100)
+
+    is_enrolled = models.BooleanField(default=False)
+
+    psa_birth_certificate = models.BooleanField(default=False)
+    psa_marriage_certificate = models.BooleanField(default=False)
+    form_138_137 = models.BooleanField(default=False)
+    certificate_of_good_moral = models.BooleanField(default=False)
+    id_pictures = models.BooleanField(default=False)
+    long_envelopes = models.BooleanField(default=False)
+    registration_form = models.BooleanField(default=False)
+    cashier_payment = models.BooleanField(default=False)
 
     def __str__(self):
         return self.full_name

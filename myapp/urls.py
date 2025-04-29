@@ -71,8 +71,11 @@ urlpatterns = [
     path('delete_announcement/<int:pk>/', views.delete_announcement, name='delete_announcement'),
     path('announcement/<int:announcement_id>/', views.announcement_page, name='announcement_page'),
     path('send-account-email/<int:student_id>/', send_account_email, name='send_account_email'),
- 
- 
+    path('admin_enrollment_dashboard/', views.admin_enrollment_dashboard, name='admin_enrollment_dashboard'),
+    path('get-student-details/<int:student_id>/', views.get_student_details, name='get_student_details'),
+    path('update-documents/<int:student_id>/', views.update_documents, name='update_documents'),
+    path('enroll-student/<int:student_id>/', views.enroll_student, name='enroll_student'),
+    
     # Applications
     path('confirmation/<int:application_id>/', views.application_confirmation, name='application_confirmation'),
     path('accept_application/<int:application_id>/', views.accept_application, name='accept_application'),

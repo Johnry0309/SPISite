@@ -4,6 +4,12 @@ import string
 import os
 import json
 
+from django.core.paginator import Paginator
+
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+
 # Django Imports
 from django.conf import settings
 from django.contrib import messages
@@ -19,6 +25,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.crypto import get_random_string
 from django.utils.html import format_html
+from django.db.models import Q
 
 # Models
 from .models import Application, ContactMessage, TeacherProfile, Grade, Class, Subject, Announcement, Student, ClassGroup 
@@ -189,6 +196,8 @@ def spicabanatuan(request):
 
 def spiangeles(request):
     return render(request, 'myapp/angeles.html')
+
+
 
  #gallery options codes
 
@@ -626,6 +635,8 @@ def accept_application(request, application_id):
                 address=address,
                 status='accepted',
                 generated_password=password,
+                strand=application.strand,
+                is_enrolled=False,
             )
 
             # 🔄 Auto-assign class group
@@ -699,6 +710,18 @@ def send_account_email(request, student_id):
     student.email_sent = True
     student.save()
 
+    return redirect('admin_dashboard')
+
+@login_required
+@user_passes_test(is_admin)
+def enroll_student(request, student_id):
+    student = get_object_or_404(Student, pk=student_id)
+
+    # Set is_enrolled to True
+    student.is_enrolled = True
+    student.save()
+
+    messages.success(request, f"{student.full_name} has been successfully enrolled.")
     return redirect('admin_dashboard')
 
 @login_required
@@ -1108,4 +1131,75 @@ def class_detail(request, class_id):
         'class': subject_class,
         'teacher': teacher,
         'students': students,
+    })
+
+from django.views.decorators.csrf import csrf_exempt
+
+def enroll_student(request, student_id):
+    student = get_object_or_404(Student, pk=student_id)
+
+    if request.method == 'POST':
+        student.is_enrolled = True
+        student.save()
+        return JsonResponse({'status': 'enrolled'})  # Send back status
+
+    return JsonResponse({'status': 'failed'}, status=400)
+
+def update_documents(request, student_id):
+    student = get_object_or_404(Student, pk=student_id)
+
+    if request.method == 'POST':
+        fields = [
+            'psa_birth_certificate',
+            'psa_marriage_certificate',
+            'form_138_137',
+            'certificate_of_good_moral',
+            'id_pictures',
+            'long_envelopes',
+            'registration_form',
+            'cashier_payment',
+        ]
+
+        for field in fields:
+            setattr(student, field, field in request.POST)
+
+        student.save()
+        return JsonResponse({'status': 'success'})  # Ensure you send 'status' as a response
+
+    return JsonResponse({'status': 'failed'}, status=400)
+
+def admin_enrollment_dashboard(request):
+    query = request.GET.get('q')
+    students = []
+
+    if query:
+        students = Student.objects.filter(
+            Q(full_name__icontains=query) | Q(email__icontains=query)
+        )
+
+    return render(request, 'enrollment_dashboard.html', {
+        'students': students,
+        'query': query
+    })
+
+def get_student_details(request, student_id):
+    student = get_object_or_404(Student, id=student_id)
+    checklist_fields = [
+        'psa_birth_certificate',
+        'psa_marriage_certificate',
+        'form_138_137',
+        'certificate_of_good_moral',
+        'id_pictures',
+        'long_envelopes',
+        'registration_form',
+        'cashier_payment'
+    ]
+
+    # Extract status message from the query parameters
+    status_message = request.GET.get('status_message')
+
+    return render(request, 'student_checklist_detail.html', {
+        'student': student,
+        'checklist_fields': checklist_fields,
+        'status_message': status_message,
     })
