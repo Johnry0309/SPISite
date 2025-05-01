@@ -1,0 +1,38 @@
+{% extends 'student_dashboard.html' %}
+
+{% block title %}My Classes{% endblock %}
+
+{% block content %}
+<h2>My Classes – Semester {{ semester }}</h2>
+
+{% if classes %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Subject Code</th>
+                <th>Subject</th>              
+                <th>Room</th>
+                <th>Teacher</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for class in classes %}
+                <tr>
+                    <td>{{ class.subject_code }}</td>
+                    <td><strong>{{ class.subject_name }}</strong></td>
+                    <td>{{ class.room }}</td>
+                    <td>
+                        {% if class.teacher %}
+                            {{ class.teacher.get_full_name|default:class.teacher.username }}
+                        {% else %}
+                            <span class="text-muted">Unassigned</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>You have no classes assigned for this semester.</p>
+{% endif %}
+{% endblock %}
