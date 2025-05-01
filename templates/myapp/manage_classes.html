@@ -248,7 +248,7 @@
         <label for="student_id" class="form-label">Select Student</label>
         <select name="student_id" class="form-select" required>
           {% for student in students %}
-            <option value="{{ student.id }}">{{ student.first_name }} {{ student.middle_name }} {{ student.last_name }}</option>
+            <option value="{{ student.id }}">{{ student.first_name }} {{ student.middle_name }} {{ student.last_name }} ({{ student.username }})</option>
           {% endfor %}
         </select>
       </div>

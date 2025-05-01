@@ -77,6 +77,7 @@ urlpatterns = [
     path('enroll-student/<int:student_id>/', views.enroll_student, name='enroll_student'),
     path('student/profile/', views.student_profile, name='student_profile'),
     path('update-picture/', views.update_profile_picture, name='update_profile_picture'),
+    path('student/classes/', views.student_classes, name='student_classes'),
 
 
     

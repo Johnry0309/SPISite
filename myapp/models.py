@@ -205,6 +205,7 @@ class ClassGroup(models.Model):
     strand = models.CharField(max_length=10, choices=STRAND_CHOICES, default='GAS')
     semester = models.CharField(max_length=1, choices=SEMESTER_CHOICES, default='1')
     level = models.CharField(max_length=4, choices=LEVEL_CHOICES, default='HS11')
+    students = models.ManyToManyField('Student', related_name='class_groups', blank=True)
 
     def __str__(self):
         return f"{self.name} - {self.get_strand_display()} - {self.get_level_display()} - {self.get_semester_display()}"

@@ -9,6 +9,8 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.http import HttpResponse
+from django.utils.timezone import now
+
 
 # Django Imports
 from django.conf import settings
@@ -916,7 +918,7 @@ def manage_classes(request):
                     subject_code=subject_code,
                     subject_name=subject_name,
                     prerequisite=prerequisite,
-                    duration=duration,
+                    duration=int(duration),
                     room=room
                 )
                 messages.success(request, 'Class added successfully.')
@@ -986,8 +988,14 @@ def manage_classes(request):
             try:
                 student = User.objects.get(id=student_id)
                 group = ClassGroup.objects.get(id=group_id)
+
+                # Add student to each class in the group
                 for class_obj in group.classes.all():
                     class_obj.students.add(student)
+
+                # ✅ Also assign the group to the student
+                group.students.add(student.student)
+
                 messages.success(request, f'{group.name} assigned to student.')
             except Exception as e:
                 messages.error(request, f'Error: {e}')
@@ -999,6 +1007,7 @@ def manage_classes(request):
         'teachers': teachers,
         'students': students,
     })
+
 
 def delete_class(request, class_id):
     class_obj = get_object_or_404(Class, id=class_id)
@@ -1232,4 +1241,34 @@ def student_profile(request):
         'student': student,
         'form': form,
         'application': student.application  # <-- this line is important
+    })
+
+
+@login_required
+def student_classes(request):
+    user = request.user
+    try:
+        student_profile = Student.objects.get(user=user)
+    except Student.DoesNotExist:
+        return render(request, 'error.html', {'message': 'Student profile not found'})
+
+    # Determine current semester (you can adjust this logic later)
+    current_month = now().month
+    current_semester = '1' if current_month <= 6 else '2'
+
+    # Get class groups assigned to the student matching current semester
+    assigned_groups = student_profile.class_groups.filter(semester=current_semester)
+
+    # Get all classes from those groups
+    classes = []
+    for group in assigned_groups:
+        classes.extend(group.classes.all())
+
+    # Optional: remove duplicates
+    classes = list(set(classes))
+
+    return render(request, 'student_classes.html', {
+        'classes': classes,
+        'student': student_profile,
+        'semester': current_semester,
     })
