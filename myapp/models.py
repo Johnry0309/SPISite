@@ -162,6 +162,7 @@ class Student(models.Model):
     generated_password = models.CharField(max_length=128, blank=True, null=True, default="samplepassword")
     email_sent = models.BooleanField(default=False)
     strand = models.CharField(max_length=100)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
     is_enrolled = models.BooleanField(default=False)
 

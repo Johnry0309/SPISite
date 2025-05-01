@@ -128,3 +128,6 @@ EMAIL_HOST_PASSWORD = 'tlzj isqj penl rtiy'  # Use the App Password here (16 cha
 DEFAULT_FROM_EMAIL = 'Skill Power Institute <johnryqadornado0309@gmail.com>'
 
 CSRF_COOKIE_SECURE = False  # Disable for development (HTTP)
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
