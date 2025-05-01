@@ -1,6 +1,10 @@
 from django import forms
-from .models import Application, Subject, Class, TeacherProfile, ClassAssignment,  Announcement
+from .models import Application, Subject, Class, TeacherProfile, ClassAssignment,  Announcement, Student
 
+class ProfilePictureForm(forms.ModelForm):
+    class Meta:
+        model = Student
+        fields = ['profile_picture']
 
 class ApplicationForm(forms.ModelForm):
     class Meta:

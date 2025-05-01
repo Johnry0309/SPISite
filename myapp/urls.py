@@ -75,6 +75,10 @@ urlpatterns = [
     path('get-student-details/<int:student_id>/', views.get_student_details, name='get_student_details'),
     path('update-documents/<int:student_id>/', views.update_documents, name='update_documents'),
     path('enroll-student/<int:student_id>/', views.enroll_student, name='enroll_student'),
+    path('student/profile/', views.student_profile, name='student_profile'),
+    path('update-picture/', views.update_profile_picture, name='update_profile_picture'),
+
+
     
     # Applications
     path('confirmation/<int:application_id>/', views.application_confirmation, name='application_confirmation'),
@@ -92,3 +96,4 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    

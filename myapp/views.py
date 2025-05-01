@@ -31,7 +31,7 @@ from django.db.models import Q
 from .models import Application, ContactMessage, TeacherProfile, Grade, Class, Subject, Announcement, Student, ClassGroup 
 
 # Forms
-from .forms import ApplicationForm, ContactForm, SubjectForm, ClassForm, AssignClassTeacherForm, AssignClassStudentForm, AddClassForm, AnnouncementForm
+from .forms import ApplicationForm, ContactForm, SubjectForm, ClassForm, AssignClassTeacherForm, AssignClassStudentForm, AddClassForm, AnnouncementForm, ProfilePictureForm
 
 # Django Auth Models
 from django.contrib.auth.models import User
@@ -197,11 +197,9 @@ def spicabanatuan(request):
 def spiangeles(request):
     return render(request, 'myapp/angeles.html')
 
-
-
- #gallery options codes
-
-
+def student_profile(request):
+    application = Application.objects.get(student__user=request.user)
+    return render(request, 'student_profile.html', {'application': application})
 
 
 def get_gallery_folders():
@@ -1202,4 +1200,36 @@ def get_student_details(request, student_id):
         'student': student,
         'checklist_fields': checklist_fields,
         'status_message': status_message,
+    })
+
+@login_required
+def update_profile_picture(request):
+    student = request.user.student  # assuming the user is logged in and tied to Student model
+
+    if request.method == 'POST':
+        picture = request.FILES.get('profile_picture')
+        if picture:
+            student.profile_picture = picture
+            student.save()
+            return redirect('student_profile')  # or wherever you want to redirect
+
+    return render(request, 'update_picture.html', {'student': student})
+
+@login_required
+def student_profile(request):
+    student = Student.objects.get(user=request.user)
+    application = student.application  # ensure application is linked
+
+    if request.method == 'POST':
+        form = ProfilePictureForm(request.POST, request.FILES, instance=student)
+        if form.is_valid():
+            form.save()
+            return redirect('student_profile')
+    else:
+        form = ProfilePictureForm(instance=student)
+
+    return render(request, 'student_profile.html', {
+        'student': student,
+        'form': form,
+        'application': student.application  # <-- this line is important
     })
