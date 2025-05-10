@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 class TeacherProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     middle_name = models.CharField(max_length=100, blank=True)
+    last_name = models.CharField(max_length=100, blank=True)
+    specialization = models.CharField(max_length=100, blank=True)
     address = models.TextField(blank=True)
 
     def __str__(self):

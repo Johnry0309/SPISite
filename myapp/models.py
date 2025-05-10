@@ -112,10 +112,22 @@ class Class(models.Model):
         return f"{self.subject_name} ({self.subject_code})"
 
 
+class StudentGrade(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Class, on_delete=models.CASCADE)
+    grade = models.FloatField()
+    
+    def __str__(self):
+        return f"{self.student.username} - {self.subject.subject_name} - {self.grade}"
+
+
 class TeacherProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=100, default="No First Name")
     middle_name = models.CharField(max_length=100, blank=True, default="")
+    last_name = models.CharField(max_length=100, blank=True, default="")
+    specialization = models.CharField(max_length=100, blank=True, default="")
+
     address = models.TextField(default="Not Provided")
 
     def __str__(self):
@@ -133,11 +145,11 @@ class ClassAssignment(models.Model):
 
 class Grade(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE)
-    course_name = models.CharField(max_length=255, default="Untitled Course")
-    grade = models.CharField(max_length=10, default="N/A")
+    subject = models.ForeignKey(Class, on_delete=models.CASCADE)
+    grade = models.FloatField()
 
     def __str__(self):
-        return f"{self.student.username} - {self.course_name}: {self.grade}"
+        return f"{self.student.username} - {self.subject.subject_name}: {self.grade}"
 
 
 class Announcement(models.Model):
