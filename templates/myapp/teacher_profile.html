@@ -1,0 +1,31 @@
+{% extends 'myapp/teacher_dashboard.html' %}
+
+{% block content %}
+<div class="main-content-card">
+  <h2>Profile</h2>
+  <form method="POST" action="{% url 'update_teacher_profile' %}">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="first_name" class="form-label">First Name</label>
+      <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}">
+    </div>
+    <div class="mb-3">
+      <label for="middle_name" class="form-label">Middle Name</label>
+      <input type="text" class="form-control" id="middle_name" name="middle_name" value="{{ user.middle_name }}">
+    </div>
+    <div class="mb-3">
+        <label for="last_name" class="form-label">Last Name</label>
+        <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}">
+      </div>
+    <div class="mb-3">
+      <label for="address" class="form-label">Address</label>
+      <input type="text" class="form-control" id="address" name="address" value="{{ user.address }}">
+    </div>
+    <div class="mb-3">
+      <label for="specialization" class="form-label">Specialization</label>
+      <input type="text" class="form-control" id="specialization" name="specialization" value="{{ profile.specialization }}">
+    </div>
+    <button type="submit" class="btn btn-primary">Update Profile</button>
+  </form>
+</div>
+{% endblock %}

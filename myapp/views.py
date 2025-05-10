@@ -113,14 +113,6 @@ def add_class(request):
         'classes': classes  # Pass the list of classes to the template
     })
 
-def teacher_profile(request):
-    if not request.user.is_authenticated or not request.user.is_staff:
-        return redirect('login')  # Or redirect to some other page if not authenticated
-    
-    # Fetch the teacher profile associated with the logged-in user
-    teacher_profile = TeacherProfile.objects.get(user=request.user)
-
-    return render(request, 'myapp/teacher_profile.html', {'teacher_profile': teacher_profile})
 
 def update_teacher_profile(request):
     if not request.user.is_authenticated or not request.user.is_staff:
@@ -132,6 +124,8 @@ def update_teacher_profile(request):
     if request.method == 'POST':
         teacher_profile.first_name = request.POST.get('first_name')
         teacher_profile.middle_name = request.POST.get('middle_name')
+        teacher_profile.last_name = request.POST.get('last_name')
+        teacher_profile.specialization = request.POST.get('specialization')
         teacher_profile.address = request.POST.get('address')
         teacher_profile.save()
         return redirect('teacher_profile')  # Redirect to the teacher profile page after saving changes
@@ -343,10 +337,61 @@ def login_view(request):
 @login_required(login_url='/login/')
 def teacher_dashboard(request):
     if not request.user.is_authenticated:
-        return redirect('login')  # Ensure this redirects only if not logged in
+        return redirect('login')
+
     if not request.user.is_staff:
-        return redirect('student_dashboard')  # Or a proper redirect if not a teacher
-    return render(request, 'myapp/teacher_dashboard.html')
+        return redirect('student_dashboard')
+
+    user = request.user
+    profile, created = TeacherProfile.objects.get_or_create(user=user)
+
+    # Handle profile update
+    if 'update_profile' in request.POST:
+        user.first_name = request.POST.get('first_name', '')
+        user.last_name = request.POST.get('last_name', '')
+        user.save()
+
+        user.middle_name = request.POST.get('middle_name', '')
+        profile.address = request.POST.get('address', '')
+        profile.specialization = request.POST.get('specialization', '')
+        profile.save()
+
+        return redirect('teacher_dashboard')
+
+    # Handle grade submission
+    if 'submit_grade' in request.POST:
+        student_id = request.POST.get('student')
+        subject_id = request.POST.get('subject')
+        grade_value = request.POST.get('grade')
+
+        print("POST data:", request.POST)
+
+        student = get_object_or_404(User, id=student_id)
+        subject_class = get_object_or_404(Class, id=subject_id)
+
+        grade_obj, created = Grade.objects.update_or_create(
+            student=student,
+            subject=subject_class,
+            defaults={'grade': grade_value}
+        )
+
+        print("Grade saved:", grade_obj.grade, "New?", created)
+
+        return redirect('teacher_dashboard')
+
+    # Load class, student, grade data
+    classes = Class.objects.filter(teacher=user)
+    students = User.objects.filter(enrolled_classes__in=classes).distinct()
+    grades = Grade.objects.filter(subject__in=classes)
+
+    return render(request, 'myapp/teacher_dashboard.html', {
+        'user': user,
+        'profile': profile,
+        'classes': classes,
+        'students': students,
+        'subjects': classes,  # If still used in your template
+        'grades': grades,
+    })
 
 @login_required(login_url='/login/')
 def student_dashboard(request):
@@ -356,17 +401,38 @@ def student_dashboard(request):
         return redirect('teacher_dashboard')  # Ensure this is working correctly
     return render(request, 'student_dashboard.html')
 
-@login_required(login_url='/login/')
+@login_required
 def teacher_profile(request):
-    # Make sure the user is logged in and has a teacher profile
-    if not request.user.is_authenticated or not request.user.is_staff:
-        return redirect('login')  # Or redirect to some other page if not authenticated
-    
-    # Fetch the teacher profile associated with the logged-in user
-    teacher_profile = TeacherProfile.objects.get(user=request.user)
-    
-    return render(request, 'myapp/teacher_profile.html', {'teacher_profile': teacher_profile})
+    classes = Class.objects.filter(teacher=request.user)
+    students = User.objects.filter(enrolled_classes__in=classes).distinct()
+    grades = Grade.objects.filter(subject__in=classes)
 
+    if request.method == "POST":
+        student_id = request.POST.get('student')
+        subject_id = request.POST.get('subject')
+        grade = request.POST.get('grade')
+
+        print("POST data:", request.POST)
+
+        student = get_object_or_404(User, id=student_id)
+        subject_class = get_object_or_404(Class, id=subject_id)
+
+        grade_obj, created = Grade.objects.update_or_create(
+            student=student,
+            subject=subject_class,
+            defaults={'grade': grade}
+        )
+
+        print("Grade saved:", grade_obj.grade, "New?", created)
+
+        return redirect('teacher_profile')
+
+    return render(request, 'myapp/teacher_dashboard.html', {
+        'classes': classes,
+        'students': students,
+        'subjects': classes,
+        'grades': grades,
+    })
 
 def custom_logout_view(request):
     logout(request)  # Logs out the user
@@ -423,31 +489,29 @@ def admin_login_view(request):
     return render(request, 'admin_login.html', {'form': form}) # renders the form
 
 
+
+@login_required(login_url='/login/')
 def update_teacher_profile(request):
     user = request.user
-
-    # Check if the profile exists, if not create a new one
     profile, created = TeacherProfile.objects.get_or_create(user=user)
 
     if request.method == 'POST':
-        user.first_name = request.POST.get('first_name')
-        user.middle_name = request.POST.get('middle_name', '')
-        user.address = request.POST.get('address', '')
+        user.first_name = request.POST.get('first_name', '')
+        user.last_name = request.POST.get('last_name', '')
         user.save()
-        
-        # Update teacher profile
+
         profile.middle_name = request.POST.get('middle_name', '')
         profile.address = request.POST.get('address', '')
+        profile.specialization = request.POST.get('specialization', '')
         profile.save()
-        
-        return redirect('teacher_dashboard')  # Redirect to teacher dashboard after update
 
-    # Pass the profile data to the template to pre-fill form fields
+        return redirect('teacher_dashboard')
+
     context = {
-        'profile': profile
+        'user': user,         # Send the full user object
+        'profile': profile,   # Include profile for middle name and address
     }
-    
-    return render(request, 'teacher_dashboard.html', context)
+    return render(request, 'myapp/teacher_dashboard.html', context)
 
 def add_grade(request):
     if request.method == 'POST':
@@ -455,11 +519,17 @@ def add_grade(request):
         subject_id = request.POST.get('subject')
         grade_value = request.POST.get('grade')
 
-        grade = Grade(student_id=student_id, subject_id=subject_id, grade_value=grade_value)
+        # Get student and subject from the database
+        student = User.objects.get(id=student_id)
+        subject = Class.objects.get(id=subject_id)
+
+        # Create the grade object and save it
+        grade = Grade(student=student, subject=subject, grade=grade_value)
         grade.save()
+
         return redirect('teacher_dashboard')
 
-    return render(request, 'teacher_dashboard.html')
+    return render(request, 'myapp/teacher_dashboard.html')
 
 @login_required(login_url='/admin/login/')  # Redirects logged-out users to login
 @user_passes_test(is_admin, login_url='/admin/login/', redirect_field_name=None)
