@@ -136,6 +136,7 @@
             <a href="{% url 'manage_classes' %}">Manage Classes/Subjects</a>
             <a href="{% url 'manage_announcements' %}">Manage Announcements</a>
             <a href="{% url 'admin_enrollment_dashboard' %}" class="{% if request.path == '/admin/enrollment_dashboard/' %}active{% endif %}">Enroll a student</a>
+            <a href="{% url 'printables' %}">Printables</a>
         </div>
 
         <form action="{% url 'logout' %}" method="post">

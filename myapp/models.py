@@ -112,15 +112,6 @@ class Class(models.Model):
         return f"{self.subject_name} ({self.subject_code})"
 
 
-class StudentGrade(models.Model):
-    student = models.ForeignKey(User, on_delete=models.CASCADE)
-    subject = models.ForeignKey(Class, on_delete=models.CASCADE)
-    grade = models.FloatField()
-    
-    def __str__(self):
-        return f"{self.student.username} - {self.subject.subject_name} - {self.grade}"
-
-
 class TeacherProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=100, default="No First Name")

@@ -1342,3 +1342,30 @@ def student_classes(request):
         'student': student_profile,
         'semester': current_semester,
     })
+
+
+def printables(request):
+    selected_class_id = request.GET.get('class_id')
+    selected_status = request.GET.get('status')
+
+    classes = Class.objects.all()
+    students = []
+
+    if selected_class_id:
+        selected_class = Class.objects.get(id=selected_class_id)
+        users_in_class = selected_class.students.all()
+        students_qs = Student.objects.filter(user__in=users_in_class)
+
+        if selected_status == 'enrolled':
+            students_qs = students_qs.filter(is_enrolled=True)
+        students = students_qs
+    else:
+        selected_class = None
+
+    context = {
+        'classes': classes,
+        'students': students,
+        'selected_class_id': selected_class_id,
+        'selected_status': selected_status,
+    }
+    return render(request, 'printables.html', context)
