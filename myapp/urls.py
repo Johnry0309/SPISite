@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
 from .views import send_account_email
+from myapp import views 
 
 from . import views
 from .views import upload_gallery_image, custom_logout, add_class
@@ -78,6 +79,7 @@ urlpatterns = [
     path('student/profile/', views.student_profile, name='student_profile'),
     path('update-picture/', views.update_profile_picture, name='update_profile_picture'),
     path('student/classes/', views.student_classes, name='student_classes'),
+    path('printables/', views.printables, name='printables'),
 
 
     

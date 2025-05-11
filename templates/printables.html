@@ -1,0 +1,196 @@
+{% extends 'admin_base.html' %}
+
+{% block content %}
+<h2>Printables</h2>
+
+<style>
+    .tab-button {
+        padding: 10px 20px;
+        border: none;
+        background-color: #eee;
+        cursor: pointer;
+        margin-right: 5px;
+        border-radius: 5px 5px 0 0;
+    }
+    .tab-button.active {
+        background-color: #fff;
+        border-bottom: 2px solid white;
+        font-weight: bold;
+    }
+    .tab-content {
+        display: none;
+        border: 1px solid #ccc;
+        padding: 20px;
+        border-radius: 0 5px 5px 5px;
+        background-color: #fff;
+    }
+    .tab-content.active {
+        display: block;
+    }
+
+    /* Only show print area when printing */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #print-area, #print-area * {
+        visibility: visible;
+    }
+    #print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        text-align: left;
+    }
+
+    @page {
+        margin: 1cm;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10pt; /* Smaller font size for compactness */
+        margin: 0; /* Reduce space around the table */
+    }
+
+    th, td {
+        text-align: left;
+        padding: 2px 5px;  /* Reduced padding for tightness */
+        line-height: 1.1;  /* Tighter line height */
+        border: 1px solid #ccc;  /* Adding borders for clarity */
+    }
+
+    tr {
+        page-break-inside: avoid;  /* Ensure rows are not split */
+    }
+
+    /* Adjust table headers */
+    th {
+        font-weight: bold;
+    }
+
+    /* Remove any extra space between rows */
+    td {
+        padding-top: 2px;
+        padding-bottom: 2px;
+    }
+
+    /* Optional: Add a separator between different print sections */
+    .tab-button {
+        display: none;  /* Hide the tabs while printing */
+    }
+
+    /* Center the class name on top */
+    .class-name {
+        text-align: center;
+        font-size: 16pt;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+}
+</style>
+
+
+<div>
+    <button class="tab-button active" onclick="switchTab('students')">Print Students</button>
+    <button class="tab-button" onclick="switchTab('grades')">Print Grades</button>
+</div>
+
+<div id="students" class="tab-content active">
+    <form method="get" class="mb-4">
+        <label for="class_id">Choose Class:</label>
+        <select name="class_id" id="class_id" required>
+            <option value="">-- Select Class --</option>
+            {% for class in classes %}
+                <option value="{{ class.id }}" {% if class.id|stringformat:"s" == selected_class_id %}selected{% endif %}>
+                    {{ class.subject_name }} ({{ class.subject_code }})
+                </option>
+            {% endfor %}
+        </select>
+
+        <label for="status">Student Status:</label>
+        <select name="status" id="status">
+            <option value="">All</option>
+            <option value="enrolled" {% if selected_status == 'enrolled' %}selected{% endif %}>Enrolled Only</option>
+        </select>
+
+        <button type="submit">Filter</button>
+        {% if students %}
+            <button type="button" onclick="printTable()">Print</button>
+        {% endif %}
+    </form>
+
+    {% if students %}
+    <div id="print-area">
+        <!-- Display Class Name on Top -->
+        {% for class in classes %}
+            {% if class.id|stringformat:"s" == selected_class_id %}
+                <div class="class-name">
+                    {{ class.subject_name }} - {{ class.subject_code }}
+                </div>
+            {% endif %}
+        {% endfor %}
+        
+        <table border="1" cellpadding="8" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Contact Number</th>
+                    <th>Previous School</th>
+                    <th>Address</th>
+                    <th>Status</th>
+                    <th>Strand</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                    <tr>
+                        <td>{{ student.full_name }}</td>
+                        <td>{{ student.email }}</td>
+                        <td>{{ student.contact_number }}</td>
+                        <td>{{ student.previous_school }}</td>
+                        <td>{{ student.address }}</td>
+                       <td>{{ student.is_enrolled|yesno:"Enrolled,Not Enrolled" }}</td>
+                        <td>{{ student.strand }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% elif selected_class_id %}
+        <p>No students found.</p>
+    {% endif %}
+</div>
+
+<div id="grades" class="tab-content">
+    <h3>Print Grades</h3>
+    <p>This section will allow you to print student grades. Placeholder for now.</p>
+</div>
+
+<script>
+    function switchTab(tabId) {
+        const buttons = document.querySelectorAll('.tab-button');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        const tabs = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => tab.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    function printTable() {
+        const printContents = document.getElementById('print-area').innerHTML;
+        const originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+        location.reload();  // optional: reloads to restore full functionality
+    }
+</script>
+{% endblock %}
