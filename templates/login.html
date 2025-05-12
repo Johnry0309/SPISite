@@ -1,3 +1,4 @@
+
 {% load static %}
 
 <!DOCTYPE html>
@@ -9,126 +10,255 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> {# For home icon #}
 
     <style>
-      body {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        background-color: #f0f0f0; /* A light background color */
-      }
-
-      .form-signin {
-        max-width: 330px;
-        padding: 2rem; /* Increased padding */
-        background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* A slightly stronger shadow */
-        backdrop-filter: blur(10px); /* The Mica-like blur effect */
-        -webkit-backdrop-filter: blur(10px); /* For Safari support */
-        border: 1px solid rgba(255, 255, 255, 0.2); /* A subtle border */
-      }
-
-      .form-signin .form-floating {
-        margin-bottom: 1.5rem; /* Increased spacing */
-      }
-
-      .form-signin .form-floating:focus-within {
-        z-index: 2;
-      }
-
-      .form-signin input[type="text"],
-      .form-signin input[type="password"] {
-        background-color: rgba(255, 255, 255, 0.9); /* Slightly opaque input fields */
-        border: none;
-        border-radius: 5px;
-        padding: 0.75rem;
-      }
-
-      .form-signin input[type="text"]:focus,
-      .form-signin input[type="password"]:focus {
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Focus state highlight */
-        outline: none;
-      }
-
-      .form-signin .btn-primary {
-        background-color: #007bff;
-        border-color: #007bff;
-        border-radius: 5px;
-        padding: 0.75rem 1.5rem;
-      }
-
-      .form-signin .btn-primary:hover {
-        background-color: #0069d9;
-        border-color: #0062cc;
-      }
-
-      .bd-placeholder-img {
-        font-size: 1.125rem;
-        text-anchor: middle;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
-      }
-
-      @media (min-width: 768px) {
-        .bd-placeholder-img-lg {
-          font-size: 3.5rem;
+        :root {
+            /* Shared styles with Admin Login for consistency */
+            --primary-color-portal: #0056b3; /* Same deep blue as admin login */
+            --primary-hover-color-portal: #004085;
+            --page-bg-portal: #f0f2f5; /* Same soft background */
+            --card-bg-portal: #ffffff; /* Solid white card */
+            --card-shadow-portal: rgba(0, 0, 0, 0.1); /* Same shadow */
+            --text-color-portal: #333;
+            --input-border-color-portal: #ced4da;
+            --input-focus-border-color-portal: #86b7fe;
+            --input-focus-box-shadow-portal: 0 0 0 0.25rem rgba(0, 86, 179, 0.25);
+            --font-family-portal: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --home-btn-bg: #6c757d; /* Same neutral gray for home button */
+            --home-btn-hover-bg: #5a6268;
         }
-      }
 
-      /* Styling for Home button at the top-right corner */
-      .home-btn {
-        position: absolute;
-        top: 40px;
-        right: 40px;
-        background-color: #007bff;
-        color: white;
-        padding: 8px 12px;
-        border-radius: 5px;
-        text-decoration: none;
-      }
+        html, body {
+            height: 100%;
+        }
 
-      .home-btn:hover {
-        background-color: #0056b3;
-      }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-top: 40px;
+            padding-bottom: 40px;
+            background-color: var(--page-bg-portal);
+            font-family: var(--font-family-portal);
+            color: var(--text-color-portal);
+        }
+
+        .form-signin-wrapper {
+            width: 100%;
+            max-width: 420px;
+            margin: auto;
+            position: relative;
+        }
+
+        .form-signin { /* This is now the solid white card */
+            padding: 30px;
+            background-color: var(--card-bg-portal); /* Solid white */
+            border-radius: 10px; /* Match admin login's card radius */
+            box-shadow: 0 5px 15px var(--card-shadow-portal); /* Match admin login's shadow */
+            /* REMOVE Mica specific styles: backdrop-filter, -webkit-backdrop-filter, border (unless you want a subtle one) */
+            /* border: 1px solid #e0e0e0; */ /* Optional: very subtle border for definition */
+            text-align: center;
+        }
+        
+        .home-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: var(--home-btn-bg);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background-color 0.2s ease-in-out;
+            z-index: 10;
+        }
+        .home-btn:hover {
+            background-color: var(--home-btn-hover-bg);
+            color: white;
+        }
+        .home-btn i {
+            margin-right: 5px;
+        }
+
+        .form-signin .logo-img {
+            margin-bottom: 25px;
+            width: 80px; /* Match Admin logo size */
+            height: auto;
+        }
+
+        .form-signin .form-title {
+            margin-bottom: 25px;
+            font-weight: 500;
+            color: var(--text-color-portal);
+            font-size: 1.75rem; /* Match admin h3 size if using h3 there, or adjust */
+        }
+
+        .form-floating {
+            margin-bottom: 1rem; /* Match admin spacing */
+        }
+
+        .form-floating > .form-control {
+            border-radius: 6px;
+            background-color: #ffffff; /* Solid white input background */
+            border: 1px solid var(--input-border-color-portal);
+            color: var(--text-color-portal);
+        }
+        .form-floating > .form-control::placeholder {
+            color: #6c757d;
+        }
+        .form-floating > .form-control:focus {
+            background-color: #ffffff; /* Keep solid white on focus */
+            border-color: var(--input-focus-border-color-portal);
+            box-shadow: var(--input-focus-box-shadow-portal);
+            outline: none;
+        }
+        .form-floating > label {
+            color: #6c757d; /* Match admin label color */
+        }
+
+        .form-check.text-start.my-3 {
+            text-align: left !important;
+            font-weight: 400;
+            font-size: 0.9rem;
+            color: #495057; /* Match admin checkbox text color */
+            margin-top: 0.5rem; /* Match admin checkbox margin */
+        }
+        .form-check.text-start.my-3 input[type="checkbox"] {
+            margin-right: 0.3rem; /* Match admin */
+            vertical-align: middle;
+            border-color: var(--input-border-color-portal);
+        }
+        .form-check.text-start.my-3 input[type="checkbox"]:focus {
+            box-shadow: var(--input-focus-box-shadow-portal);
+        }
+
+        .btn-submit-portal { /* Renamed for clarity, can be .btn-primary if no conflicts */
+            background-color: var(--primary-color-portal);
+            border-color: var(--primary-color-portal);
+            color: white;
+            padding: 0.75rem 1rem; /* Match admin button padding */
+            font-size: 1.05rem; /* Match admin button font size */
+            font-weight: 500;
+            border-radius: 6px;
+            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+        }
+        .btn-submit-portal:hover {
+            background-color: var(--primary-hover-color-portal);
+            border-color: var(--primary-hover-color-portal);
+            color: white;
+        }
+        .btn-submit-portal:focus {
+            box-shadow: var(--input-focus-box-shadow-portal);
+        }
+
+        /* Error Messages Styling - Match Admin styling */
+        .alert-custom-error {
+            color: #721c24; /* Bootstrap danger text color */
+            background-color: #f8d7da; /* Bootstrap danger background */
+            border: 1px solid #f5c6cb; /* Bootstrap danger border */
+            padding: 0.75rem 1.25rem; /* Bootstrap alert padding */
+            margin-top: 1rem;
+            margin-bottom: 1rem; /* Add bottom margin too */
+            border-radius: 0.25rem; /* Bootstrap alert radius */
+            font-size: 0.9rem;
+            text-align: left;
+        }
+         .invalid-feedback { /* Ensure Bootstrap's invalid feedback is styled if shown */
+            font-size: 0.875em;
+            text-align: left; /* Explicitly align left */
+         }
+
+
+        /* Responsive adjustments - Match Admin */
+        @media (max-width: 576px) {
+            .form-signin-wrapper {
+                margin: 20px;
+            }
+            .form-signin {
+                padding: 20px;
+            }
+            .home-btn {
+                top: 15px;
+                right: 15px;
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+            .form-signin .logo-img {
+                width: 70px; /* Match Admin */
+            }
+            .form-signin .form-title {
+                font-size: 1.5rem; /* Match Admin */
+            }
+        }
     </style>
 </head>
 <body>
 
-<!-- Home button in the top-right corner -->
+<div class="form-signin-wrapper">
+    <a href="{% url 'home' %}" class="home-btn">
+        <i class="fas fa-home"></i> Home
+    </a>
 
-<main class="form-signin w-100 m-auto">
-  <form method="post">
-    {% csrf_token %}
-    <img class="mb-4" src="{% static 'images/SPI_LOGO-removebg-preview.png' %}" alt="" width="65" height="57">
-    <a href="{% url 'home' %}" class="home-btn">Home</a>
+    <main class="form-signin w-100 m-auto">
+      <form method="post">
+        {% csrf_token %}
+        <img class="mb-4 logo-img" src="{% static 'images/SPI_LOGO-removebg-preview.png' %}" alt="SPI Logo">
+        <h1 class="h3 mb-3 fw-normal form-title">Student Portal Login</h1>
 
-    <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+        {# Display Django form errors or messages #}
+        {% if form.non_field_errors %}
+            <div class="alert-custom-error">
+                {% for error in form.non_field_errors %}
+                    <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% elif messages %}
+            {% for message in messages %}
+                {% if message.tags == 'error' %} {# Only show error messages this way #}
+                <div class="alert-custom-error">
+                    <p class="mb-0">{{ message }}</p>
+                </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
 
-    <div class="form-floating">
-      <input type="text" class="form-control" id="floatingInput" name="username" placeholder="Username">
-      <label for="floatingInput">Username</label>
-    </div>
-    <div class="form-floating">
-      <input type="password" class="form-control" id="floatingPassword" name="password" placeholder="Password">
-      <label for="floatingPassword">Password</label>
-    </div>
+        <div class="form-floating">
+          <input type="text" class="form-control {% if form.username.errors %}is-invalid{% endif %}" id="floatingInput" name="username" placeholder="Username" value="{{ form.username.value|default:'' }}" required>
+          <label for="floatingInput">Username</label>
+          {% if form.username.errors %}
+              <div class="invalid-feedback d-block text-start">
+                  {% for error in form.username.errors %}
+                      {{ error }}
+                  {% endfor %}
+              </div>
+          {% endif %}
+        </div>
+        <div class="form-floating">
+          <input type="password" class="form-control {% if form.password.errors %}is-invalid{% endif %}" id="floatingPassword" name="password" placeholder="Password" required>
+          <label for="floatingPassword">Password</label>
+          {% if form.password.errors %}
+              <div class="invalid-feedback d-block text-start">
+                  {% for error in form.password.errors %}
+                      {{ error }}
+                  {% endfor %}
+              </div>
+          {% endif %}
+        </div>
 
-    <div class="form-check text-start my-3">
-      <input class="form-check-input" type="checkbox" value="remember-me" id="flexCheckDefault">
-      <label class="form-check-label" for="flexCheckDefault">
-        Remember me
-      </label>
-    </div>
-    <button class="btn btn-primary w-100 py-2" type="submit">Sign in</button>
+        <div class="form-check text-start my-3">
+          <input class="form-check-input" type="checkbox" name="remember_me" value="remember-me" id="flexCheckDefault">
+          <label class="form-check-label" for="flexCheckDefault">
+            Remember me
+          </label>
+        </div>
+        <button class="btn btn-submit-portal w-100 py-2" type="submit">Sign in</button> {# Changed class to btn-submit-portal #}
 
-    {% if form.errors %}
-      <p style="color: red;">Invalid username or password.</p>
-    {% endif %}
-  </form>
-</main>
+        <p class="mt-5 mb-3 text-muted">© Skill Power Institute {% now "Y" %}</p> {# Dynamic year #}
+      </form>
+    </main>
+</div>
 
 <!-- Bootstrap Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

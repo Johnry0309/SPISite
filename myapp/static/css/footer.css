@@ -1,75 +1,217 @@
-/* Compact Footer Styles */
+/* --- CSS Custom Properties (Variables) for easier theming --- */
+:root {
+    --footer-bg-color-mica: rgba(7, 119, 69, 0.9);; /* Slightly increased opacity for better text contrast */
+    --footer-backdrop-blur: 12px; /* Slightly less blur can sometimes help text pop */
+    --footer-backdrop-saturate: 130%;
+    
+    --footer-border-top-color: #ffc107;
+    --footer-border-top-width: 4px;
+
+    /* --- FONT SETTINGS FOR READABILITY --- */
+    --font-family-main: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; /* Robust font stack */
+    
+    /* Base font size for the footer - aiming for clear readability */
+    --base-font-size-footer: 16px; /* Increased from 15px */
+    
+    /* Line height for comfortable reading */
+    --line-height-footer: 1.75; /* Increased slightly */
+
+    /* Content text within sections (paragraphs, etc.) */
+    --content-text-font-size: 0.95rem; /* This will be 16px * 0.95 = 15.2px. Good for content. */
+                                       /* Or you can use a fixed value like 15px */
+    --content-text-font-weight: 400; /* Standard weight for body text */
+    --text-color-primary: #f0f0f0; /* Very light gray, almost white, for high contrast */
+    
+    /* Labels like "Address:", "Email:" */
+    --text-color-secondary-label: #ffdd70; /* Gold, good contrast */
+    --label-font-weight: 500; /* Medium weight for labels */
+
+    /* Section Titles */
+    --section-title-color: #ffffff; /* Pure white for max contrast */
+    --section-title-font-size: 1.2rem; /* Approx 19.2px if base is 16px. Clear and distinct. */
+    --section-title-weight: 600; /* Semi-bold for titles */
+    --section-title-letter-spacing: 0.5px;
+    --section-title-underline-color: rgba(255, 193, 7, 0.6); /* Slightly more opaque underline */
+
+    /* Links */
+    --link-color: #ffd54f; /* Vibrant gold */
+    --link-font-weight: 500; /* Medium weight for links to make them stand out */
+    --link-hover-color: #ffffff;
+    --link-hover-decoration-color: #ffc107;
+}
+
+/* --- Base Styles --- */
+html {
+    height: 100%;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased; /* Smoother fonts on WebKit */
+    -moz-osx-font-smoothing: grayscale; /* Smoother fonts on Firefox */
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-family-main);
+    background-color: #e9ecef; /* Light page background for contrast */
+}
+
+main {
+    flex: 1;
+}
+
+/* --- Footer Container --- */
 footer {
-    color: #ffffff;
-    padding: 5px 10px;
-    display: flex;
-    flex-wrap: wrap; /* Allows wrapping of footer sections */
-    justify-content: space-between;
-    align-items: flex-start;
-    backdrop-filter: blur(3px); /* Adjusted blur effect */
-    -webkit-backdrop-filter: blur(3px); /* Adjusted blur effect */
-    border-radius: 1px;
-    margin-top: 3px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0);
-    font-size: 12px; /* Smaller font size */
-    line-height: 1.4;
+    background-color: var(--footer-bg-color-mica);
+    -webkit-backdrop-filter: blur(var(--footer-backdrop-blur)) saturate(var(--footer-backdrop-saturate));
+    backdrop-filter: blur(var(--footer-backdrop-blur)) saturate(var(--footer-backdrop-saturate));
+    
+    color: var(--text-color-primary);
+    padding: 50px 40px;
+    
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); /* Ensure enough min-width */
+    gap: 40px; /* Good spacing between sections */
+    
+    border-top: var(--footer-border-top-width) solid var(--footer-border-top-color);
+    box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.15);
+    
+    font-size: var(--base-font-size-footer);
+    line-height: var(--line-height-footer);
 }
 
-/* Footer Sections */
-footer .footer-section {
-    flex: 1 1 180px; /* Allows the sections to adjust based on content */
-    margin: 5px;
-    padding: 8px; /* Ensures padding inside sections */
-    display: flex;
-    flex-direction: column; /* Stacks items vertically */
+/* --- Footer Sections --- */
+
+/* Section Titles */
+.footer-section > p:first-child {
+    font-size: var(--section-title-font-size);
+    color: var(--section-title-color);
+    font-weight: var(--section-title-weight);
+    text-transform: uppercase;
+    letter-spacing: var(--section-title-letter-spacing);
+    margin-top: 0;
+    margin-bottom: 22px; /* More space after title */
+    padding-bottom: 10px;
+    border-bottom: 1.5px solid var(--section-title-underline-color); /* Slightly thicker underline */
+}
+.footer-section > p:first-child strong {
+    font-weight: inherit; 
+    color: inherit;
 }
 
-/* Map iframe */
+/* --- Content within Sections --- */
+.footer-section p:not(:first-child) {
+    margin: 12px 0; /* Generous margin for paragraph spacing */
+    font-size: var(--content-text-font-size);
+    font-weight: var(--content-text-font-weight);
+}
+.footer-section p:not(:first-child) strong { /* Labels like "Address:", "Contact:" */
+    color: var(--text-color-secondary-label);
+    font-weight: var(--label-font-weight);
+    margin-right: 0.4em;
+}
+
+/* Links (General) */
+.footer-section a {
+    color: var(--link-color);
+    font-weight: var(--link-font-weight);
+    text-decoration: none; /* No underline by default */
+    border-radius: 3px;
+    padding: 2px 1px;
+    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out, text-decoration-color 0.2s ease-in-out;
+    border-bottom: 1px solid transparent; /* Prepare for hover underline */
+}
+.footer-section a:hover,
+.footer-section a:focus {
+    color: var(--link-hover-color);
+    border-bottom: 1.5px solid var(--link-hover-decoration-color); /* Clear underline on hover/focus */
+    outline: none;
+}
+
+/* More specific for navigation links (direct children of .footer-section) */
+.footer-section > a { /* e.g., About Us, Programs */
+    display: block;
+    margin: 10px 0; /* More vertical space for nav links */
+    padding: 8px 10px; /* Good tap/click area */
+    border-bottom: none; /* Remove the general link hover underline if using background */
+}
+.footer-section > a:hover,
+.footer-section > a:focus {
+    background-color: rgba(255, 255, 255, 0.12); /* Slightly more visible hover background */
+    border-bottom: none; /* Ensure no competing underlines */
+    color: var(--link-hover-color); /* Ensure hover color is applied */
+}
+
+/* Accessibility: Clear focus indicator */
+.footer-section a:focus-visible {
+    outline: 2px solid var(--link-hover-color);
+    outline-offset: 3px; /* More space for outline */
+    box-shadow: 0 0 0 3px var(--footer-bg-color-mica);
+}
+
+/* Map Iframe */
 .map-frame {
     width: 100%;
-    height: 160px; /* Adjusted map height */
-    border: 0;
+    min-height: 200px;
     border-radius: 8px;
-    margin-top: 5px;
+    border: 1px solid rgba(255, 193, 7, 0.25); /* Slightly more visible border */
+    margin-top: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-/* Links */
-footer a {
-    color: #eafb89df;
-    text-decoration: none;
-    transition: color 0.2s ease;
-    display: block;
-    margin-bottom: 3px;
-}
-
-footer a:hover {
-    color: #FFECB3;
-}
-
-/* Labels */
-footer strong {
-    display: block;
-    margin-bottom: 3px;
-    font-weight: bold;
-    color: #fff;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
+/* --- Responsive Adjustments --- */
+@media (max-width: 992px) { /* Tablet */
     footer {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        font-size: 12px;
+        padding: 40px 30px;
+        gap: 35px;
     }
+    :root { /* Adjust sizes slightly for tablet if needed */
+        --section-title-font-size: 1.15rem;
+        --base-font-size-footer: 15px; /* Can slightly reduce base on tablet */
+    }
+     /* Re-calculate content font size if base changes for this breakpoint */
+    .footer-section p:not(:first-child) {
+      font-size: calc(var(--base-font-size-footer) * 0.95); /* e.g. 15px * 0.95 = 14.25px */
+    }
+}
 
+@media (max-width: 768px) { /* Large Mobile - Sections will likely stack */
+    footer {
+        padding: 35px 20px;
+        gap: 0;
+    }
+    :root {
+        --base-font-size-footer: 15px; /* Keep at 15px or 16px if preferred */
+        --section-title-font-size: 1.1rem;
+    }
     .footer-section {
-        width: 100%;
-        margin: 8px 0;
-        padding: 8px;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px dashed rgba(255, 255, 255, 0.2); /* More visible separator */
     }
+    .footer-section:last-child {
+        margin-bottom: 0;
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+    .map-frame { min-height: 180px; }
+}
 
-    .map-frame {
-        height: 150px;
+@media (max-width: 480px) { /* Small Mobile */
+    :root {
+        /* Keep base font size readable, don't go too small */
+        --base-font-size-footer: 15px;
+        --section-title-font-size: 1.05rem; /* Approx 15.75px */
+        --line-height-footer: 1.65; /* Can slightly reduce line height if space is tight, but monitor readability */
     }
+    footer { 
+        padding: 30px 15px; 
+    }
+     /* Ensure content text isn't too small */
+    .footer-section p:not(:first-child) {
+      font-size: 0.93rem; /* Approx 13.95px if base is 15px - minimum acceptable for many */
+                          /* Or set directly: font-size: 14px; */
+    }
+    .map-frame { min-height: 160px; }
 }

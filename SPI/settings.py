@@ -108,7 +108,7 @@ STATICFILES_DIRS = [
 ]
 
 # Collect static files for production (run collectstatic before deployment)
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = BASE_DIR / 'static'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
