@@ -1391,3 +1391,5 @@ def printables(request):
         'all_students': Student.objects.all(),  # for search bar
     }
     return render(request, 'printables.html', context)
+
+
