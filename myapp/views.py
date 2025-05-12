@@ -1343,14 +1343,17 @@ def student_classes(request):
         'semester': current_semester,
     })
 
-
 def printables(request):
     selected_class_id = request.GET.get('class_id')
     selected_status = request.GET.get('status')
+    selected_student_id = request.GET.get('student_id')
 
     classes = Class.objects.all()
     students = []
+    subjects_with_grades = []
+    selected_student = None
 
+    # For "Print Students" tab
     if selected_class_id:
         selected_class = Class.objects.get(id=selected_class_id)
         users_in_class = selected_class.students.all()
@@ -1362,10 +1365,29 @@ def printables(request):
     else:
         selected_class = None
 
+    # For "Print Grades" tab
+    if selected_student_id:
+        try:
+            selected_student = Student.objects.get(id=selected_student_id)
+            enrolled_classes = selected_student.user.enrolled_classes.all()
+
+            for cls in enrolled_classes:
+                grade_obj = Grade.objects.filter(student=selected_student.user, subject=cls).first()
+                subjects_with_grades.append({
+                    'subject': cls,
+                    'grade': grade_obj.grade if grade_obj else 'Ungraded'
+                })
+        except Student.DoesNotExist:
+            selected_student = None
+
     context = {
         'classes': classes,
         'students': students,
         'selected_class_id': selected_class_id,
         'selected_status': selected_status,
+        'selected_student': selected_student,
+        'selected_student_id': selected_student_id,
+        'subjects_with_grades': subjects_with_grades,
+        'all_students': Student.objects.all(),  # for search bar
     }
     return render(request, 'printables.html', context)
