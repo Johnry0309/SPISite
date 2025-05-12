@@ -28,78 +28,63 @@
         display: block;
     }
 
-    /* Only show print area when printing */
-@media print {
-    body * {
-        visibility: hidden;
-    }
-    #print-area, #print-area * {
-        visibility: visible;
-    }
-    #print-area {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        padding: 0;
-        margin: 0;
-        text-align: left;
-    }
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        #print-area, #print-area * {
+            visibility: visible;
+        }
+        #print-area {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
 
-    @page {
-        margin: 1cm;
-    }
+        @page {
+            margin: 1cm;
+        }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 10pt; /* Smaller font size for compactness */
-        margin: 0; /* Reduce space around the table */
-    }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10pt;
+        }
 
-    th, td {
-        text-align: left;
-        padding: 2px 5px;  /* Reduced padding for tightness */
-        line-height: 1.1;  /* Tighter line height */
-        border: 1px solid #ccc;  /* Adding borders for clarity */
-    }
+        th, td {
+            text-align: left;
+            padding: 5px;
+            border: 1px solid #ccc;
+        }
 
-    tr {
-        page-break-inside: avoid;  /* Ensure rows are not split */
-    }
+        tr {
+            page-break-inside: avoid;
+        }
 
-    /* Adjust table headers */
-    th {
-        font-weight: bold;
-    }
+        th {
+            font-weight: bold;
+        }
 
-    /* Remove any extra space between rows */
-    td {
-        padding-top: 2px;
-        padding-bottom: 2px;
-    }
+        .tab-button, form {
+            display: none;
+        }
 
-    /* Optional: Add a separator between different print sections */
-    .tab-button {
-        display: none;  /* Hide the tabs while printing */
+        .class-name {
+            text-align: center;
+            font-size: 16pt;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
     }
-
-    /* Center the class name on top */
-    .class-name {
-        text-align: center;
-        font-size: 16pt;
-        margin-bottom: 10px;
-        font-weight: bold;
-    }
-}
 </style>
-
 
 <div>
     <button class="tab-button active" onclick="switchTab('students')">Print Students</button>
     <button class="tab-button" onclick="switchTab('grades')">Print Grades</button>
 </div>
 
+<!-- STUDENTS TAB -->
 <div id="students" class="tab-content active">
     <form method="get" class="mb-4">
         <label for="class_id">Choose Class:</label>
@@ -124,73 +109,156 @@
         {% endif %}
     </form>
 
-    {% if students %}
+    <div>
+        <h4>Search Results:</h4>
+        <ul class="list-group mb-4" id="student-results">
+            {% for student in students %}
+                <li class="list-group-item">
+                    <a href="#" onclick="loadStudentDetails({{ student.id }})">{{ student.full_name }} ({{ student.email }})</a>
+                </li>
+            {% endfor %}
+        </ul>
+
+        {% if students %}
+        <div id="print-area">
+            {% for class in classes %}
+                {% if class.id|stringformat:"s" == selected_class_id %}
+                    <div class="class-name">
+                        {{ class.subject_name }} - {{ class.subject_code }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Contact Number</th>
+                        <th>Previous School</th>
+                        <th>Address</th>
+                        <th>Status</th>
+                        <th>Strand</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                        <tr>
+                            <td>{{ student.full_name }}</td>
+                            <td>{{ student.email }}</td>
+                            <td>{{ student.contact_number }}</td>
+                            <td>{{ student.previous_school }}</td>
+                            <td>{{ student.address }}</td>
+                            <td>{{ student.is_enrolled|yesno:"Enrolled,Not Enrolled" }}</td>
+                            <td>{{ student.strand }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- GRADES TAB -->
+<div id="grades" class="tab-content">
+    <form method="get" class="mb-4" onsubmit="return handleStudentSearch(event);">
+        <label for="student-search">Search Student:</label>
+        <input type="text" id="student-search" placeholder="Enter name..." autocomplete="off" required>
+        <input type="hidden" name="student_id" id="student-id-hidden">
+        <button type="submit">Search</button>
+    </form>
+
+    <div id="student-suggestions" style="margin-top: 10px;"></div>
+
+    {% if selected_student %}
     <div id="print-area">
-        <!-- Display Class Name on Top -->
-        {% for class in classes %}
-            {% if class.id|stringformat:"s" == selected_class_id %}
-                <div class="class-name">
-                    {{ class.subject_name }} - {{ class.subject_code }}
-                </div>
-            {% endif %}
-        {% endfor %}
-        
-        <table border="1" cellpadding="8" cellspacing="0">
+        <div class="class-name">
+            Grades for {{ selected_student.full_name }}
+        </div>
+
+        <table>
             <thead>
                 <tr>
-                    <th>Full Name</th>
-                    <th>Email</th>
-                    <th>Contact Number</th>
-                    <th>Previous School</th>
-                    <th>Address</th>
-                    <th>Status</th>
+                    <th>Subject</th>
+                    <th>Subject Code</th>
                     <th>Strand</th>
+                    <th>Year</th>
+                    <th>Semester</th>
+                    <th>Grade</th>
                 </tr>
             </thead>
             <tbody>
-                {% for student in students %}
-                    <tr>
-                        <td>{{ student.full_name }}</td>
-                        <td>{{ student.email }}</td>
-                        <td>{{ student.contact_number }}</td>
-                        <td>{{ student.previous_school }}</td>
-                        <td>{{ student.address }}</td>
-                       <td>{{ student.is_enrolled|yesno:"Enrolled,Not Enrolled" }}</td>
-                        <td>{{ student.strand }}</td>
-                    </tr>
+                {% for entry in subjects_with_grades %}
+                <tr>
+                    <td>{{ entry.subject.subject_name }}</td>
+                    <td>{{ entry.subject.subject_code }}</td>
+                    <td>{{ entry.subject.strand|join:", " }}</td>
+                    <td>{{ entry.subject.year_level }}</td>
+                    <td>{{ entry.subject.semester }}</td>
+                    <td>{{ entry.grade }}</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
+        <button type="button" onclick="printTable()">Print</button>
     </div>
-    {% elif selected_class_id %}
-        <p>No students found.</p>
+    {% elif selected_student_id %}
+        <p>No subjects or grades found for this student.</p>
     {% endif %}
 </div>
 
-<div id="grades" class="tab-content">
-    <h3>Print Grades</h3>
-    <p>This section will allow you to print student grades. Placeholder for now.</p>
-</div>
-
 <script>
-    function switchTab(tabId) {
-        const buttons = document.querySelectorAll('.tab-button');
-        buttons.forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
+    const allStudents = [
+        {% for student in all_students %}
+            { id: "{{ student.id }}", name: "{{ student.full_name|escapejs }}" },
+        {% endfor %}
+    ];
 
-        const tabs = document.querySelectorAll('.tab-content');
-        tabs.forEach(tab => tab.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
+    function handleStudentSearch(event) {
+        event.preventDefault();
+        const searchInput = document.getElementById('student-search').value.toLowerCase();
+        const suggestions = document.getElementById('student-suggestions');
+        suggestions.innerHTML = '';
+
+        const matches = allStudents.filter(s => s.name.toLowerCase().includes(searchInput));
+
+        if (matches.length === 0) {
+            suggestions.innerHTML = '<p>No matching students found.</p>';
+            return false;
+        }
+
+        matches.forEach(student => {
+            const btn = document.createElement('button');
+            btn.textContent = student.name;
+            btn.style.display = 'block';
+            btn.style.margin = '5px 0';
+            btn.type = 'button';
+            btn.onclick = () => {
+                document.getElementById('student-id-hidden').value = student.id;
+                event.target.closest('form').submit();
+            };
+            suggestions.appendChild(btn);
+        });
+
+        return false;
+    }
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(div => div.classList.remove('active'));
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+        event.target.classList.add('active');
     }
 
     function printTable() {
-        const printContents = document.getElementById('print-area').innerHTML;
-        const originalContents = document.body.innerHTML;
-
-        document.body.innerHTML = printContents;
         window.print();
-        document.body.innerHTML = originalContents;
-        location.reload();  // optional: reloads to restore full functionality
+    }
+
+    function loadStudentDetails(studentId) {
+        document.getElementById('student-id-hidden').value = studentId;
+        document.querySelector('form').submit();
     }
 </script>
+
 {% endblock %}
