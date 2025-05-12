@@ -17,6 +17,17 @@
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
     <style>
+        :root {
+    --primary-gold: gold; /* #FFD700 */
+    --dark-gold-hover: darkgoldenrod; /* #B8860B */
+    --text-dark-button: black; /* Or a very dark gray #212529 */
+    --text-light-button-hover: white; /* Or a very light gray #f8f9fa */
+
+    /* Spacing: Define how much space you want */
+    --section-vertical-padding: 60px; /* e.g., 60px top and bottom padding for sections */
+    --section-horizontal-padding: 20px; /* e.g., 20px left and right padding */
+    --button-section-bottom-margin: 40px; /* Space AFTER the apply button container */
+}
         .announcement-carousel-wrapper {
             overflow: hidden;
             border: 1px solid #cccccc69;
@@ -102,39 +113,65 @@
         }
 
         .apply-btn-container {
-            text-align: center;
-            margin-top: 20px;
-        }
+    text-align: center;
+    padding-top: 30px; /* Space above the button */
+    padding-bottom: var(--button-section-bottom-margin); /* Space below the button container */
+    /* Optional: give it a distinct background if it's its own visual block */
+    /* background-color: #f8f9fa; */
+}
 
-        .apply-btn {
-            background-color: gold;
-            color: black;
-            padding: 15px 30px;
-            font-size: 1.8rem;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: bold;
-            display: inline-block;
-            transition: background-color 0.3s;
-        }
+.apply-btn {
+    background-color: var(--primary-gold);
+    color: var(--text-dark-button);
+    padding: 15px 35px; /* Slightly more horizontal padding */
+    font-size: clamp(1.3rem, 3vw, 1.8rem); /* Responsive font size */
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-block;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border: 2px solid transparent; /* For focus state */
+}
 
-        .apply-btn:hover {
-            background-color: darkgoldenrod;
-        }
+.apply-btn:hover, .apply-btn:focus {
+    background-color: var(--dark-gold-hover);
+    color: var(--text-light-button-hover); /* Ensure contrast on hover */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    outline: none;
+}
+.apply-btn:focus-visible { /* Clearer focus for accessibility */
+    outline: 2px solid var(--dark-gold-hover);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.4);
+}
+.scroll-section {
+    /* CRITICAL FIX: Add padding inside each scroll section */
+    padding-top: var(--section-vertical-padding);
+    padding-bottom: var(--section-vertical-padding);
+    padding-left: var(--section-horizontal-padding);
+    padding-right: var(--section-horizontal-padding);
 
-        .scroll-section {
-            margin-top: 0;
-            transition: background-color 0.5s ease-in-out;
-        }
+    /* margin-top: 0; /* This is fine if the element above it (like .apply-btn-container) handles the bottom spacing */
+    transition: background-color 0.5s ease-in-out;
+}
 
-        .scroll-section:nth-child(odd) {
-            background-color: rgba(0,128,0,0.1);
-        }
+/* Ensure content within .scroll-section has some constraints for readability */
+.scroll-section > * { /* Targets direct children */
+    max-width: 900px; /* Example max-width for content inside */
+    margin-left: auto;
+    margin-right: auto;
+}
 
-        .scroll-section:nth-child(even) {
-            background-color: rgba(255,215,0,0.1);
-        }
 
+.scroll-section:nth-child(odd) {
+    background-color: rgba(0,128,0,0.08); /* Slightly adjusted opacity */
+}
+
+.scroll-section:nth-child(even) {
+    background-color: rgba(255,215,0,0.08); /* Slightly adjusted opacity */
+}
         .swiper-container {
             width: 80%;
             max-width: 800px;

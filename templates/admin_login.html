@@ -1,57 +1,232 @@
-{% extends "admin_login_base.html" %} 
+{% extends "admin_login_base.html" %}
 {% load static %}
 
-{% block title %}Admin Login{% endblock %}
+{% block title %}Admin Portal Login{% endblock %}
 
 {% block extrastyle %}
     {{ block.super }}
-    <link rel="stylesheet" type="text/css" href="{% static 'myapp/css/admin_login.css' %}">
+    {# If you have significant existing styles in admin_login.css, review for conflicts #}
+    {# <link rel="stylesheet" type="text/css" href="{% static 'myapp/css/admin_login.css' %}"> #}
     <style>
-      /* Home button positioned at the upper-right corner */
-      .home-btn {
-        position: absolute;
-        top: 40px;  /* Distance from the top */
-        right: 40px;  /* Distance from the right */
-        background-color: #3296ef;  /* Button color */
-        color: white;
-        padding: 8px 16px;  /* Padding inside the button */
-        border-radius: 5px;  /* Rounded corners */
-        text-decoration: none;  /* Remove underline from link */
-      }
+        :root {
+            --primary-color: #0056b3; /* A slightly deeper blue */
+            --primary-hover-color: #004085;
+            --light-bg: #f0f2f5; /* Softer background for the page */
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --input-border-color: #ced4da;
+            --input-focus-border-color: #86b7fe;
+            --input-focus-box-shadow: 0 0 0 0.25rem rgba(0, 86, 179, 0.25);
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
 
-      .home-btn:hover {
-        background-color: #5a6268;  /* Darker shade when hovering */
-      }
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            align-items: center; /* Vertically center the form */
+            justify-content: center; /* Horizontally center the form */
+            padding-top: 40px;
+            padding-bottom: 40px;
+            background-color: var(--light-bg);
+            font-family: var(--font-family);
+            color: var(--text-color);
+        }
+
+        .form-signin-wrapper {
+            width: 100%;
+            max-width: 420px; /* Slightly wider for better spacing */
+            padding: 30px; /* More padding inside the card */
+            margin: auto;
+            background-color: var(--card-bg);
+            border-radius: 10px; /* Rounded corners for the card */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Softer shadow */
+            position: relative; /* For positioning home button relative to this */
+        }
+
+        .home-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #6c757d; /* A neutral gray */
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .home-btn:hover {
+            background-color: #5a6268;
+            color: white;
+        }
+        .home-btn i {
+            margin-right: 5px;
+        }
+
+        .form-signin {
+            text-align: center; /* Center logo and title */
+        }
+
+        .form-signin .logo-img { /* Specific class for logo */
+            margin-bottom: 25px; /* More space below logo */
+            width: 80px; /* Adjust as needed */
+            height: auto; /* Maintain aspect ratio */
+        }
+
+        .form-signin .form-title { /* Specific class for title */
+            margin-bottom: 25px;
+            font-weight: 500; /* Slightly less heavy than default h1 */
+            color: var(--text-color);
+        }
+
+        .form-floating {
+            margin-bottom: 1rem; /* Consistent spacing */
+        }
+
+        .form-floating > .form-control {
+            border-radius: 6px; /* Softer border radius for inputs */
+            border-color: var(--input-border-color);
+        }
+        .form-floating > .form-control:focus {
+            border-color: var(--input-focus-border-color);
+            box-shadow: var(--input-focus-box-shadow);
+        }
+        .form-floating > label {
+            color: #6c757d; /* Softer label color */
+        }
+
+        .checkbox.mb-3 { /* More specific selector */
+            text-align: left; /* Align checkbox to the left */
+            font-weight: 400;
+            font-size: 0.9rem;
+            color: #495057;
+            margin-top: 0.5rem;
+        }
+        .checkbox.mb-3 input[type="checkbox"] {
+            margin-right: 0.3rem;
+            vertical-align: middle;
+        }
+
+        .btn-primary { /* Customizing Bootstrap's primary button */
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 0.75rem 1rem; /* Adjust padding */
+            font-size: 1.05rem;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-hover-color);
+            border-color: var(--primary-hover-color);
+        }
+        .btn-primary:focus {
+            box-shadow: var(--input-focus-box-shadow);
+        }
+
+        .form-signin .text-muted {
+            font-size: 0.85rem;
+            margin-top: 30px !important; /* More space above copyright */
+        }
+
+        /* Error Messages Styling (if you add them via Django messages framework) */
+        .alert-error { /* Example class for error messages */
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid #f5c6cb;
+            border-radius: 0.25rem;
+            text-align: left;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
+            .form-signin-wrapper {
+                margin: 20px; /* Add some margin on small screens so it's not edge-to-edge */
+                padding: 20px; /* Less padding on small screens */
+            }
+            .home-btn {
+                top: 15px;
+                right: 15px;
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+            .form-signin .logo-img {
+                width: 70px;
+            }
+            .form-signin .form-title {
+                font-size: 1.5rem; /* Adjust title size */
+            }
+        }
     </style>
 {% endblock %}
 
 {% block content %}
-<main class="form-signin">
-  <!-- Home Button positioned in the upper-right corner -->
-  <a href="{% url 'home' %}" class="home-btn">Home</a>
-  
-  <form method="post">
-    {% csrf_token %}
-    <img class="mb-4" src="{% static 'images/SPI_LOGO-removebg-preview.png' %}" alt="" width="72" height="57">
-    <h1 class="h3 mb-3 fw-normal">Admin Login</h1>
+<div class="form-signin-wrapper">
+    <a href="{% url 'home' %}" class="home-btn">
+        <i class="fas fa-home"></i> Home {# Added Font Awesome icon #}
+    </a>
 
-    <div class="form-floating">
-      <input type="text" class="form-control" id="floatingInput" name="username" placeholder="Username">
-      <label for="floatingInput">Username</label>
-    </div>
-    <div class="form-floating">
-      <input type="password" class="form-control" id="floatingPassword" name="password" placeholder="Password">
-      <label for="floatingPassword">Password</label>
-    </div>
+    <main class="form-signin">
+        <form method="post">
+            {% csrf_token %}
+            <img class="logo-img" src="{% static 'images/SPI_LOGO-removebg-preview.png' %}" alt="SPI Logo">
+            <h1 class="h3 form-title">Admin Portal Login</h1>
 
-    <div class="checkbox mb-3">
-      <label>
-        <input type="checkbox" value="remember-me"> Remember me
-      </label>
-    </div>
-    <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
+            {# Optional: Display Django messages (e.g., for login errors) #}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
 
-    <p class="mt-5 mb-3 text-muted">© 2025–2026</p>
-  </form>
-</main>
+
+            <div class="form-floating">
+                <input type="text" class="form-control {% if form.username.errors %}is-invalid{% endif %}" id="floatingInput" name="username" placeholder="Username" value="{{ form.username.value|default:'' }}" required>
+                <label for="floatingInput">Username</label>
+                {% if form.username.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in form.username.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="form-floating">
+                <input type="password" class="form-control {% if form.password.errors %}is-invalid{% endif %}" id="floatingPassword" name="password" placeholder="Password" required>
+                <label for="floatingPassword">Password</label>
+                {% if form.password.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in form.password.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="checkbox mb-3">
+                <label>
+                    <input type="checkbox" name="remember_me" value="remember-me"> Remember me
+                </label>
+            </div>
+            <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
+
+            <p class="mt-5 mb-3 text-muted">© Skill Power Institute 2025–2026</p> {# More specific copyright #}
+        </form>
+    </main>
+</div>
 {% endblock %}
