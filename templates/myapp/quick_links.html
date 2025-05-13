@@ -1,205 +1,235 @@
 {# myapp/templates/myapp/quick_links.html #}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quick Access Portals</title> {# More descriptive title #}
-    {# Bootstrap CSS can be kept if other parts of your site use it, otherwise remove if not needed for this page #}
-    {# <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> #}
+    <title>Quick Access Portals</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         /* ==============================
-   GLOBAL STYLES & VARIABLES
-   ============================== */
-:root {
-    --primary-blue: #007bff;
-    --primary-blue-darker: #0056b3;
-    --card-bg: #f8f9fa;
-    --card-shadow: rgba(0, 0, 0, 0.08);
-    --card-hover-shadow: rgba(0, 0, 0, 0.15);
-    --text-dark: #212529;
-    --text-light: #ffffff;
-    --icon-color: var(--primary-blue);
-    --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    --border-radius-sm: 5px;
-    --border-radius-md: 10px;
-}
+           GLOBAL STYLES & VARIABLES
+           ============================== */
+        :root {
+            --primary-blue: #007bff;
+            --primary-blue-darker: #0056b3;
+            --card-bg: #ffffff;
+            --card-bg-hover: #f8f9fa;
+            --card-shadow: rgba(0, 0, 0, 0.08);
+            --card-hover-shadow: rgba(0, 0, 0, 0.15);
+            --text-dark: #212529;
+            --text-light: #ffffff;
+            --icon-color: var(--primary-blue);
+            --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            --border-radius-sm: 5px;
+            --border-radius-md: 12px;
 
-body {
-    font-family: var(--font-family-sans);
-    background-color: #eef2f7; /* Softer page background */
-    color: var(--text-dark);
-    margin: 0;
-    padding: 20px; /* Add some padding around the body */
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Center content horizontally */
-    min-height: 100vh; /* Ensure footer (if any) is pushed down */
-}
+            /* Mica Style Variables */
+            --mica-bg: rgba(245, 248, 252, 0.65); /* Light, cool, semi-transparent */
+            --mica-blur: 15px;
+            --body-bg-color: #d8e0e8; /* A soft fallback color for the body if image doesn't load, or a complementary color */
+        }
 
-.page-container { /* Wrapper for content */
-    background-color: #ffffff;
-    padding: 30px;
-    border-radius: var(--border-radius-md);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    width: 100%;
-    max-width: 800px; /* Control max width of content area */
-    text-align: center; /* Center inner elements like button and title */
-}
+        body {
+            font-family: var(--font-family-sans);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* Center page-container vertically too */
+            min-height: 100vh;
+            box-sizing: border-box;
 
-/* ==============================
-   BACK TO HOME BUTTON
-   ============================== */
-.back-to-home {
-    display: inline-flex; /* Use flex for icon alignment */
-    align-items: center;
-    gap: 8px; /* Space between icon and text */
-    padding: 12px 24px;
-    background-color: var(--primary-blue);
-    color: var(--text-light);
-    text-decoration: none;
-    border-radius: var(--border-radius-sm);
-    font-weight: 500;
-    transition: background-color 0.25s ease, transform 0.2s ease;
-    margin-bottom: 30px; /* More space below */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
+            /* === LOGO BACKGROUND === */
+            /* IMPORTANT: Adjust path if your logo is not in myapp/static/myapp/images/ */
+            background-image: url("{% static 'images/SPI_LOGO-removebg-preview.png' %}");
+            background-size: contain; /* Or try a fixed size like '300px', or 'auto 60%' to control height */
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: var(--body-bg-color); /* Fallback or complementary color */   
+        }
 
-.back-to-home:hover, .back-to-home:focus {
-    background-color: var(--primary-blue-darker);
-    transform: translateY(-2px);
-    color: var(--text-light); /* Ensure text color remains light */
-    outline: none;
-}
-.back-to-home:focus-visible {
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.4);
-}
-.back-to-home i {
-    font-size: 1em; /* Adjust icon size relative to text */
-}
+        .page-container {
+            /* === MICA STYLE === */
+            background-color: var(--mica-bg);
+            backdrop-filter: blur(var(--mica-blur));
+            -webkit-backdrop-filter: blur(var(--mica-blur)); /* For Safari */
 
-/* ==============================
-   SECTION TITLE
-   ============================== */
-.section-title { /* Changed h3 to a class for more specific styling */
-    font-size: clamp(1.8rem, 4vw, 2.5rem); /* Responsive font size */
-    color: var(--text-dark);
-    margin-bottom: 35px; /* More space below title */
-    font-weight: 600;
-}
+            padding: 35px 40px;
+            border-radius: var(--border-radius-md);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2); /* A shadow that fits mica */
+            border: 1px solid rgba(255, 255, 255, 0.18); /* Subtle border for the glass edge */
+            
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            margin: 20px; /* Ensure some space around container if logo is large */
+        }
 
+        /* ==============================
+           BACK TO HOME BUTTON
+           ============================== */
+        .back-to-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background-color: var(--primary-blue);
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: var(--border-radius-sm);
+            font-weight: 500;
+            transition: background-color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+            margin-bottom: 35px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
 
-/* ==============================
-   PORTAL LINKS SECTION
-   ============================== */
-.portal-links {
-    display: flex;
-    flex-wrap: wrap; /* Allow cards to wrap to the next line */
-    justify-content: center; /* Center cards if there's extra space */
-    gap: 25px; /* Consistent spacing between cards */
-    padding-top: 10px; /* Some space above cards if title is very close */
-}
+        .back-to-home:hover, .back-to-home:focus {
+            background-color: var(--primary-blue-darker);
+            transform: translateY(-2px);
+            color: var(--text-light);
+            outline: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .back-to-home:focus-visible {
+            box-shadow: 0 0 0 3px rgba(var(--primary-blue), 0.4), 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .back-to-home i {
+            font-size: 1em;
+        }
 
-.portal-card {
-    /* display: inline-block; */ /* Replaced by flex item properties */
-    /* width: 200px; */ /* Replaced by flex-basis */
-    flex: 1 1 220px; /* Grow, Shrink, Basis: cards will try to be 220px, but can grow/shrink */
-    max-width: 280px; /* Prevent cards from becoming too wide on larger flex lines */
-    
-    min-height: 180px; /* Min height, allows content to expand it */
-    /* height: 140px; */ /* Removed fixed height */
+        /* ==============================
+           SECTION TITLE
+           ============================== */
+        .section-title {
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            color: var(--text-dark); /* Ensure text is readable on mica */
+            margin-bottom: 40px;
+            font-weight: 600;
+            text-shadow: 0px 1px 3px rgba(0,0,0,0.1); /* Optional: slight shadow for readability on mica */
+        }
 
-    background-color: var(--card-bg);
-    border-radius: var(--border-radius-md);
-    box-shadow: 0 3px 8px var(--card-shadow);
-    padding: 25px; /* Increased padding */
-    text-decoration: none;
-    color: var(--text-dark);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    /* overflow: hidden; */ /* Less critical with flexible height */
-    text-align: center;
-    
-    display: flex; /* For centering content vertically within the card */
-    flex-direction: column;
-    justify-content: center; /* Vertically center content */
-    align-items: center; /* Horizontally center content (already done by text-align but good for flex) */
-}
+        /* ==============================
+           PORTAL LINKS SECTION
+           ============================== */
+        .portal-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            padding-top: 10px;
+        }
 
-.portal-card:hover, .portal-card:focus {
-    transform: translateY(-5px) scale(1.03); /* More pronounced hover */
-    box-shadow: 0 6px 12px var(--card-hover-shadow);
-    color: var(--primary-blue); /* Change text/icon color on hover */
-    outline: none;
-}
-.portal-card:focus-visible {
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.4), 0 6px 12px var(--card-hover-shadow) ;
-}
+        .portal-card {
+            flex: 1 1 220px;
+            max-width: 280px;
+            min-height: 190px;
+            background-color: var(--card-bg); /* Cards are opaque */
+            border-radius: var(--border-radius-md);
+            box-shadow: 0 4px 10px var(--card-shadow);
+            border: 1px solid rgba(0,0,0,0.03);
+            padding: 30px 25px;
+            text-decoration: none;
+            color: var(--text-dark);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
 
+        .portal-card:hover, .portal-card:focus {
+            transform: translateY(-6px) scale(1.04);
+            box-shadow: 0 8px 16px var(--card-hover-shadow);
+            color: var(--primary-blue);
+            background-color: var(--card-bg-hover);
+            outline: none;
+        }
+        .portal-card:focus-visible {
+            box-shadow: 0 0 0 3px rgba(var(--primary-blue), 0.4), 0 8px 16px var(--card-hover-shadow);
+            outline: 2px solid var(--primary-blue);
+            outline-offset: 2px;
+        }
 
-.portal-card i {
-    font-size: clamp(2.5em, 6vw, 3.5em); /* Responsive icon size */
-    display: block;
-    margin-bottom: 15px; /* More space below icon */
-    color: var(--icon-color); /* Icon color */
-    transition: color 0.25s ease;
-}
-.portal-card:hover i, .portal-card:focus i {
-    color: var(--primary-blue-darker); /* Darker icon on card hover */
-}
+        .portal-card i {
+            font-size: clamp(2.8em, 7vw, 3.8em);
+            display: block;
+            margin-bottom: 18px;
+            color: var(--icon-color);
+            transition: color 0.25s ease, transform 0.25s ease;
+        }
+        .portal-card:hover i, .portal-card:focus i {
+            color: var(--primary-blue-darker);
+            transform: scale(1.05);
+        }
 
-.portal-card .card-text { /* Add a span/div around the text for styling */
-    font-size: 1rem;
-    font-weight: 500;
-    line-height: 1.4;
-}
+        .portal-card .card-text {
+            font-size: 1.05rem;
+            font-weight: 500;
+            line-height: 1.4;
+        }
 
-/* ==============================
-   RESPONSIVE ADJUSTMENTS
-   ============================== */
-@media (max-width: 768px) {
-    .page-container {
-        padding: 20px;
-    }
-    .portal-card {
-        flex-basis: 200px; /* Slightly smaller basis on tablets */
-    }
-}
+        /* ==============================
+           RESPONSIVE ADJUSTMENTS
+           ============================== */
+        @media (max-width: 768px) {
+            .page-container {
+                padding: 25px;
+                margin: 15px;
+                /* Consider reducing blur on smaller screens if performance is an issue */
+                /* --mica-blur: 8px; */
+            }
+            .portal-card {
+                flex-basis: 200px;
+                min-height: 180px;
+            }
+             .section-title {
+                font-size: clamp(1.7rem, 5vw, 2.2rem);
+            }
+        }
 
-@media (max-width: 576px) {
-    body {
-        padding: 15px;
-    }
-    .page-container {
-        padding: 20px 15px;
-    }
-    .portal-links {
-        gap: 20px; /* Slightly smaller gap */
-        flex-direction: column; /* Stack cards vertically */
-        align-items: center; /* Center stacked cards */
-    }
-    .portal-card {
-        flex: 1 1 100%; /* Make cards take full width when stacked */
-        max-width: 320px; /* Or a preferred max-width for single column */
-        min-height: 160px; /* Adjust min height if needed */
-        padding: 20px;
-    }
-    .portal-card i {
-        font-size: clamp(2.2em, 5vw, 3em);
-        margin-bottom: 12px;
-    }
-    .portal-card .card-text {
-        font-size: 0.95rem;
-    }
-    .back-to-home {
-        padding: 10px 18px;
-        font-size: 0.95rem;
-    }
-    .section-title {
-        font-size: clamp(1.5rem, 3.5vw, 2rem);
-        margin-bottom: 25px;
-    }
-}
+        @media (max-width: 576px) {
+            body {
+                padding: 10px;
+                background-size: 80% auto; /* Adjust logo size for small screens if 'contain' is too large */
+            }
+            .page-container {
+                padding: 25px 20px;
+                margin: 10px;
+            }
+            .portal-links {
+                gap: 20px;
+                flex-direction: column;
+                align-items: center;
+            }
+            .portal-card {
+                flex: 1 1 100%;
+                max-width: 340px;
+                min-height: 160px;
+                padding: 25px;
+            }
+            .portal-card i {
+                font-size: clamp(2.5em, 6vw, 3.2em);
+                margin-bottom: 15px;
+            }
+            .portal-card .card-text {
+                font-size: 1rem;
+            }
+            .back-to-home {
+                padding: 10px 20px;
+                font-size: 0.95rem;
+                margin-bottom: 25px;
+            }
+            .section-title {
+                font-size: clamp(1.6rem, 6vw, 2rem);
+                margin-bottom: 30px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -213,15 +243,13 @@ body {
         <div class="portal-links">
             <a href="{% url 'login' %}" class="portal-card">
                 <i class="fas fa-graduation-cap"></i>
-                <span class="card-text">Student / Teacher Portal</span> {# Wrapped text in span #}
+                <span class="card-text">Student / Teacher Portal</span>
             </a>
             <a href="{% url 'admin_login' %}" class="portal-card">
                 <i class="fas fa-lock"></i>
-                <span class="card-text">Admin Portal</span> {# Wrapped text in span #}
+                <span class="card-text">Admin Portal</span>
             </a>
         </div>
     </div>
-    {# Bootstrap JS - only if you use Bootstrap components that need it #}
-    {# <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> #}
 </body>
 </html>

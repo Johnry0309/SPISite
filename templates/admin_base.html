@@ -8,152 +8,306 @@
     <title>{% block title %}Admin Portal{% endblock %}</title>
 
     <!-- External Libraries -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap">
-    <link rel="stylesheet" href="{% static 'css/manage_announcements.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+    
+    {# Link to a global admin CSS file if you have one for common admin styles #}
+    {# <link rel="stylesheet" href="{% static 'css/admin_global.css' %}"> #}
+    
+    {# Child templates can link specific CSS files here #}
+    {% block head_extra_css %}{% endblock %}
+
     <style>
+        :root {
+            /* Sidebar Variables */
+            --admin-sidebar-bg: rgba(52, 73, 94, 0.85); /* Darker, slightly transparent blue-grey */
+            --admin-sidebar-blur: 8px;
+            --admin-sidebar-text-color: #ecf0f1;
+            --admin-sidebar-text-hover-color: #ffffff;
+            --admin-sidebar-active-bg: rgba(44, 62, 80, 1); /* Solid, darker for active */
+            --admin-sidebar-link-hover-bg: rgba(255, 255, 255, 0.1);
+            --admin-sidebar-width: 280px;
+            --admin-sidebar-border-color: rgba(255, 255, 255, 0.15);
+
+            /* Main Content Mica Variables */
+            --admin-main-content-mica-bg: rgba(245, 247, 249, 0.75); /* Light, semi-transparent */
+            --admin-main-content-mica-blur: 12px;
+            
+            /* Body Background */
+            --admin-body-bg-fallback: #e9ecef;
+
+            /* General Theming & Content Card (used by child templates) */
+            --content-card-bg: #ffffff; /* This is for the .mica-card / .admin-dashboard-content */
+            --primary-accent: #3498db; /* Admin primary color (e.g., for buttons) */
+            --danger-accent: #e74c3c;
+            --success-accent: #2ecc71;
+            --info-accent: #5dade2;
+            --warning-accent: #f39c12;
+            --text-dark: #2c3e50; /* Darker text for good contrast */
+            --text-muted: #7f8c8d;
+            --border-color: #bdc3c7; /* For tables, dividers etc. */
+            --border-radius-md: 8px;
+            --border-radius-lg: 12px;
+            --box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        }
+
         body {
             min-height: 100vh;
-            background-color: #f0f0f0;
             display: flex;
             margin: 0;
             font-family: 'Roboto', sans-serif;
+            /* === BACKGROUND IMAGE FOR MICA EFFECT === */
+            /* Replace with your admin area background image */
+            background-image: url("{% static 'myapp/images/admin_background_default.jpg' %}"); /* <<< CHANGE THIS */
+            /* Example: background-image: url("https://images.unsplash.com/photo-1507608443099-5S7rB44d6C0?auto=format&fit=crop&w=1920&q=80"); */
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: var(--admin-body-bg-fallback);
         }
 
         .sidebar {
-            width: 280px;
-            background-color: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 20px;
+            width: var(--admin-sidebar-width);
+            background-color: var(--admin-sidebar-bg);
+            backdrop-filter: blur(var(--admin-sidebar-blur));
+            -webkit-backdrop-filter: blur(var(--admin-sidebar-blur));
+            color: var(--admin-sidebar-text-color);
+            padding: 25px 20px;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            /* No margin: 20px here, handle spacing with body padding or main-content margin if needed */
+            box-shadow: 3px 0px 15px rgba(0,0,0,0.1);
+            border-right: 1px solid var(--admin-sidebar-border-color);
+            overflow-y: auto; /* For scrollable sidebar if content is long */
+            transition: width 0.3s ease;
+        }
+
+        .sidebar-header {
             text-align: center;
-            margin: 20px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--admin-sidebar-border-color);
         }
 
-        .sidebar img {
-            max-width: 150px;
-            margin-bottom: 20px;
-            border-radius: 50%;
-        }
-
-        .sidebar h4 {
-            color: #37474f;
+        .sidebar-logo {
+            max-width: 120px; /* Adjust size */
             margin-bottom: 15px;
+            border-radius: 50%; /* If your logo is circular */
+            background-color: rgba(255,255,255,0.05); /* Subtle bg for logo */
+            padding: 5px;
+        }
+
+        .sidebar-welcome-text {
+            font-size: 1.1rem;
             font-weight: 500;
-        }
-
-        .sidebar a {
-            display: block;
-            padding: 10px 15px;
-            text-decoration: none;
-            color: #37474f;
-            border-radius: 5px;
-            transition: background-color 0.2s ease-in-out;
-            width: 100%;
-            text-align: left;
-            margin-bottom: 5px;
-        }
-
-        .sidebar a:hover {
-            background-color: rgba(255, 255, 255, 0.5);
+            color: var(--admin-sidebar-text-hover-color); /* Brighter for welcome */
         }
 
         .sidebar-section {
-            margin-bottom: 15px;
+            margin-bottom: 25px;
             width: 100%;
         }
 
-        .sidebar-section h5 {
-            color: #455a64;
-            font-size: 1.1em;
-            margin-bottom: 10px;
+        .sidebar-section h5 { /* Section Titles */
+            color: var(--admin-sidebar-text-hover-color); /* Brighter for titles */
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--admin-sidebar-border-color);
             text-align: left;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            padding-bottom: 5px;
         }
 
-        .logout-button {
-            margin-top: auto;
+        .sidebar-stats p {
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+            color: var(--admin-sidebar-text-color);
+            text-align: left;
+        }
+        .sidebar-stats p strong {
+            color: var(--admin-sidebar-text-hover-color);
+        }
+
+
+        .sidebar-nav a {
+            display: flex; /* For icon alignment */
+            align-items: center;
+            gap: 12px; /* Space between icon and text */
+            padding: 10px 12px;
+            text-decoration: none;
+            color: var(--admin-sidebar-text-color);
+            border-radius: var(--border-radius-md);
+            transition: background-color 0.2s ease, color 0.2s ease;
             width: 100%;
+            text-align: left;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
         }
 
-        .main-content {
+        .sidebar-nav a:hover {
+            background-color: var(--admin-sidebar-link-hover-bg);
+            color: var(--admin-sidebar-text-hover-color);
+        }
+        .sidebar-nav a.active {
+            background-color: var(--admin-sidebar-active-bg);
+            color: var(--admin-sidebar-text-hover-color);
+            font-weight: 500;
+        }
+        .sidebar-nav a i {
+            width: 18px; /* Consistent icon width */
+            text-align: center;
+            font-size: 1.05em; /* Relative to link text */
+        }
+
+        .sidebar-footer {
+            margin-top: auto; /* Pushes logout to the bottom */
+            padding-top: 20px;
+            border-top: 1px solid var(--admin-sidebar-border-color);
+        }
+
+        .logout-button { /* Bootstrap btn classes will apply mostly */
+            font-weight: 500;
+        }
+
+        /* Main Content Area */
+        .main-content-wrapper {
             flex: 1;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            overflow-x: hidden;
+            padding: 30px; /* Padding around the actual content card */
+            overflow-y: auto; /* If main content itself needs to scroll */
+            display: flex; /* To center .content-card if max-width is used */
+            flex-direction: column; /* To align .content-card at the top */
+            align-items: center; /* Center .content-card horizontally */
+
+            /* MICA for the wrapper around the card */
+            background-color: var(--admin-main-content-mica-bg);
+            backdrop-filter: blur(var(--admin-main-content-mica-blur));
+            -webkit-backdrop-filter: blur(var(--admin-main-content-mica-blur));
+            border-radius: var(--border-radius-lg) 0 0 var(--border-radius-lg); /* Rounded left if sidebar is on left */
         }
 
-        .mica-card {
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        .content-card { /* This is what you called .mica-card previously */
+            background-color: var(--content-card-bg); /* Opaque white */
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--box-shadow);
             padding: 30px;
             width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
+            max-width: 1200px; /* Control max width of content */
+            /* min-height: calc(100vh - 60px); Optional: if you want card to fill height */
         }
+
+        /* Responsive Adjustments */
+        @media (max-width: 992px) { /* Adjust breakpoint as needed */
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                padding: 15px;
+                border-right: none;
+                border-bottom: 1px solid var(--admin-sidebar-border-color);
+                border-radius: 0; /* Full width */
+                backdrop-filter: blur(var(--admin-sidebar-blur)); /* Keep blur if desired */
+            }
+            .sidebar-header {
+                padding-bottom: 0; border-bottom: none; margin-bottom:0; flex-grow: 0; display:flex; align-items:center;
+            }
+            .sidebar-logo { max-width: 50px; margin-bottom:0; margin-right: 15px;}
+            .sidebar-welcome-text { font-size: 1rem; display:none; } /* Hide on small screens or make smaller */
+
+            .sidebar-section { display: none; } /* Hide stats and detailed nav sections for simplicity on mobile */
+            .sidebar-nav-mobile { display: flex !important; } /* Show a simplified mobile nav */
+            .sidebar-nav { display: none; } /* Hide default nav */
+
+            .sidebar-nav-mobile a { padding: 8px 10px; gap: 6px; }
+            .sidebar-nav-mobile a .link-text { display: none; } /* Show only icons */
+            .sidebar-nav-mobile a i { font-size: 1.3em; }
+
+            .sidebar-footer { margin-top:0; padding-top:0; border-top:none; flex-grow: 0; }
+            .logout-button { padding: 8px 12px; font-size: 0.9rem;}
+
+            .main-content-wrapper {
+                padding: 20px;
+                border-radius: 0;
+            }
+            .content-card {
+                padding: 20px;
+            }
+        }
+        .sidebar-nav-mobile { display: none; } /* Hidden by default, shown in media query */
+
     </style>
 
-    {% block head %}{% endblock %}
+    {% block head %}{% endblock %} {# Keep this for child templates to add to <head> #}
 </head>
 <body>
 
-    <div class="sidebar">
-        <img src="{% static 'images/SPI_LOGO-removebg-preview.png' %}" alt="School Logo">
-        
-        <div class="sidebar-section">
-            <h4>Welcome, Admin!</h4>
+    <aside class="sidebar">
+        <div>
+            <div class="sidebar-header">
+                <img src="{% static 'images/SPI_LOGO-removebg-preview.png' %}" alt="School Logo" class="sidebar-logo">
+                {# Ensure path is correct, e.g., 'myapp/images/...' if app-specific static #}
+                <h4 class="sidebar-welcome-text">Admin Panel</h4>
+            </div>
+
+            <div class="sidebar-section sidebar-stats">
+                <h5>Statistics</h5>
+                <p><strong>Applications:</strong> {{ application_count|default:0 }}</p>
+                <p><strong>Pending:</strong> {{ pending_count|default:0 }}</p>
+                <p><strong>Messages:</strong> {{ message_count|default:0 }}</p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="sidebar-section">
+                    <h5>Management</h5>
+                    <a href="{% url 'admin_home' %}" class="{% if request.resolver_match.url_name == 'admin_home' %}active{% endif %}"><i class="fas fa-tachometer-alt"></i> Home</a>
+                    <a href="{% url 'admin_dashboard' %}" class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}"><i class="fas fa-file-alt"></i> All Applications</a>
+                    <a href="{% url 'contact_messages' %}" class="{% if request.resolver_match.url_name == 'contact_messages' %}active{% endif %}"><i class="fas fa-envelope"></i> Messages</a>
+                    <a href="{% url 'upload_image' %}" class="{% if request.resolver_match.url_name == 'upload_image' %}active{% endif %}"><i class="fas fa-images"></i> Upload Images</a>
+                    <a href="{% url 'add_delete_admin' %}" class="{% if request.resolver_match.url_name == 'add_delete_admin' %}active{% endif %}"><i class="fas fa-user-shield"></i> Add/Delete Admin</a>
+                    <a href="{% url 'manage_classes' %}" class="{% if request.resolver_match.url_name == 'manage_classes' %}active{% endif %}"><i class="fas fa-chalkboard-teacher"></i> Manage Classes</a>
+                    <a href="{% url 'manage_announcements' %}" class="{% if request.resolver_match.url_name == 'manage_announcements' %}active{% endif %}"><i class="fas fa-bullhorn"></i> Announcements</a>
+                    <a href="{% url 'admin_enrollment_dashboard' %}" class="{% if request.resolver_match.url_name == 'admin_enrollment_dashboard' %}active{% endif %}"><i class="fas fa-user-plus"></i> Enroll Student</a>
+                    <a href="{% url 'printables' %}" class="{% if request.resolver_match.url_name == 'printables' %}active{% endif %}"><i class="fas fa-print"></i> Printables</a>
+                </div>
+            </nav>
+            <!-- Mobile specific nav (simplified) -->
+            <nav class="sidebar-nav-mobile">
+                 <a href="{% url 'admin_home' %}" title="Home"><i class="fas fa-tachometer-alt"></i></a>
+                 <a href="{% url 'admin_dashboard' %}" title="Applications"><i class="fas fa-file-alt"></i></a>
+                 <a href="{% url 'contact_messages' %}" title="Messages"><i class="fas fa-envelope"></i></a>
+                 <a href="{% url 'manage_classes' %}" title="Classes"><i class="fas fa-chalkboard-teacher"></i></a>
+            </nav>
         </div>
 
-        <div class="sidebar-section">
-            <h5>Statistics</h5>
-            <p>Total Applications: {{ application_count }}</p>
-            <p>Accepted: {{ accepted_count }}</p>
-            <p>Rejected: {{ rejected_count }}</p>
-            <p>Pending: {{ pending_count }}</p>
-            <p>Messages: {{ message_count }}</p>
+        <div class="sidebar-footer">
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger logout-button w-100">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
         </div>
+    </aside>
 
-        <div class="sidebar-section">
-            <h5>Manage Applications</h5>
-            <a href="{% url 'admin_home' %}">Home</a>
-            <a href="{% url 'admin_dashboard' %}">All Applications</a>
-            <a href="#">Accept Applications</a>
-            <a href="#">Reject Applications</a>
-            <a href="{% url 'contact_messages' %}">Messages</a>
-            <a href="{% url 'upload_image' %}">Upload Images</a>
-            <a href="{% url 'add_delete_admin' %}">Add/Delete Admin</a>
-            <a href="{% url 'manage_classes' %}">Manage Classes/Subjects</a>
-            <a href="{% url 'manage_announcements' %}">Manage Announcements</a>
-            <a href="{% url 'admin_enrollment_dashboard' %}" class="{% if request.path == '/admin/enrollment_dashboard/' %}active{% endif %}">Enroll a student</a>
-            <a href="{% url 'printables' %}">Printables</a>
-        </div>
-
-        <form action="{% url 'logout' %}" method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger logout-button">Logout</button>
-        </form>
-    </div>
-
-    <main class="main-content">
-        <div class="mica-card">
+    <main class="main-content-wrapper">
+        <div class="content-card">
             {% block content %}
+                <!-- Default content if no block is provided by child template -->
+                <h2>Admin Dashboard</h2>
+                <p>Welcome to the admin control panel. Please select an option from the sidebar to get started.</p>
             {% endblock %}
         </div>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     {% block extra_js %}{% endblock %}
 
 </body>

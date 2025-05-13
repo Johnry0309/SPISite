@@ -2,56 +2,260 @@
 {% include 'myapp/nav.html' %}
 
 {% load static %}
+{# Link to your existing application.css. We'll add new styles below, or you can move them into application.css #}
 <link rel="stylesheet" href="{% static 'css/application.css' %}">
-<!--This file is for application_process.html-->
-<div class="process-container">
-    <div class="step">
-        <h2>Step 1: Online Registration</h2>
-        <p>Prospective students must first register online to create an account.</p>
-        <a href="#" class="apply-button">Apply Now</a>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<style>
+    /* Styles specific to this application_process.html page */
+    /* Ensure these :root variables match or complement your global site theme if you have one */
+    :root {
+        --page-primary-accent: #007bff; /* Or your school's primary color */
+        --page-primary-accent-darker: #0056b3;
+        --page-text-dark: #212529;
+        --page-text-light: #495057;
+        --page-step-icon-bg: var(--page-primary-accent);
+        --page-step-icon-color: #ffffff;
+        --page-border-radius-md: 8px;
+        --page-border-radius-lg: 12px;
+
+        /* Mica specific variables for this page's content area */
+        --content-mica-bg: rgba(255, 255, 255, 0.75); /* Semi-transparent white */
+        --content-mica-blur: 12px;
+        --content-card-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        --content-card-border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* This body style is crucial. If you have a global CSS for body, ensure it has a background image. */
+    /* If not, apply this to the body or a main wrapper OUTSIDE header/footer */
+    /* For this example, I'll assume there's a wrapper or the body itself has the background */
+    /* body.application-page-body { ... } */
+
+    .main-application-content {
+        padding: 40px 20px; /* Padding above and below the process container */
+        flex-grow: 1; /* Ensures this area pushes footer down if body is flex */
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Centers the .process-page-wrapper */
+    }
+
+    .process-page-wrapper { /* For centering and max-width of title + process-container */
+        width: 100%;
+        max-width: 900px;
+        text-align: center;
+    }
+
+    .process-page-title {
+        font-size: clamp(1.8rem, 5vw, 2.5rem); /* Responsive font size */
+        font-weight: 700;
+        color: var(--page-text-dark);
+        margin-bottom: 30px;
+        text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+    }
+
+    /* This is the .process-container from your original HTML - now with MICA effect */
+    .process-container {
+        background-color: var(--content-mica-bg);
+        backdrop-filter: blur(var(--content-mica-blur));
+        -webkit-backdrop-filter: blur(var(--content-mica-blur));
+        border-radius: var(--page-border-radius-lg);
+        box-shadow: var(--content-card-shadow);
+        border: var(--content-card-border);
+        padding: 30px 25px; /* Adjusted padding */
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Center steps and arrows */
+        gap: 20px;
+    }
+
+    .step {
+        background-color: rgba(255,255,255,0.85); /* Slightly more opaque for readability within Mica */
+        padding: 20px;
+        border-radius: var(--page-border-radius-md);
+        width: 100%;
+        max-width: 600px; /* Control width of individual steps */
+        text-align: center;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+        border: 1px solid rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .step-header {
+        display: flex;
+        align-items: center;
+        gap: 12px; /* Space between number and title */
+        margin-bottom: 15px;
+    }
+
+    .step-number {
+        background-color: var(--page-step-icon-bg);
+        color: var(--page-step-icon-color);
+        min-width: 36px; /* Ensures circle size */
+        height: 36px;
+        border-radius: 50%;
+        display: inline-flex; /* Use inline-flex for centering content */
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        font-weight: 700;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .step h2 { /* Title of the step */
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: var(--page-text-dark);
+        margin: 0; /* Reset margin */
+    }
+
+    .step p { /* Description text of the step */
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: var(--page-text-light);
+        margin-bottom: 15px;
+    }
+    .step p:last-of-type { /* Remove bottom margin from last paragraph in step */
+        margin-bottom: 0;
+    }
+
+    .arrow {
+        font-size: 1.8rem;
+        color: var(--page-primary-accent);
+        font-weight: bold;
+        padding: 5px 0;
+        opacity: 0.8;
+    }
+     .arrow i {
+        animation: bounceArrow 1.8s infinite ease-in-out;
+    }
+
+    @keyframes bounceArrow { /* Subtle bounce */
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
+
+    .apply-button {
+        background-color: var(--page-primary-accent);
+        color: white !important;
+        padding: 10px 25px;
+        text-decoration: none;
+        border-radius: var(--page-border-radius-md);
+        font-size: 1rem;
+        font-weight: 500;
+        transition: background-color 0.25s ease, transform 0.15s ease;
+        display: inline-flex; /* To align icon and text */
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .apply-button:hover {
+        background-color: var(--page-primary-accent-darker);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .process-container {
+            padding: 20px 15px;
+            gap: 15px;
+        }
+        .step {
+            padding: 15px;
+        }
+        .step h2 {
+            font-size: 1.25rem;
+        }
+        .step p {
+            font-size: 0.9rem;
+        }
+        .arrow {
+            font-size: 1.6rem;
+        }
+    }
+</style>
+
+{# It's good practice to wrap your page-specific content in a <main> tag #}
+<main class="main-application-content">
+    <div class="process-page-wrapper">
+        <h1 class="process-page-title">Our Application Process</h1>
+
+        {# This is your original .process-container which will now have the Mica effect #}
+        <div class="process-container">
+            <div class="step">
+                <div class="step-header">
+                    <span class="step-number">1</span>
+                    <h2>Online Registration</h2>
+                </div>
+                <p>Prospective students must first register online to create an account and submit their initial application details.</p>
+                <a href="#" class="apply-button"><i class="fas fa-user-plus"></i> Apply Now</a>
+            </div>
+
+            <div class="arrow"><i class="fas fa-arrow-down"></i></div>
+
+            <div class="step">
+                <div class="step-header">
+                    <span class="step-number">2</span>
+                    <h2>Admin Review & Approval</h2>
+                </div>
+                <p>Once registered, our admissions team will carefully review your online application for initial approval.</p>
+            </div>
+
+            <div class="arrow"><i class="fas fa-arrow-down"></i></div>
+
+            <div class="step">
+                <div class="step-header">
+                    <span class="step-number">3</span>
+                    <h2>Login & Profile Completion</h2>
+                </div>
+                <p>If approved, you'll receive login credentials via email. Log in to complete your detailed student profile.</p>
+            </div>
+
+            <div class="arrow"><i class="fas fa-arrow-down"></i></div>
+
+            <div class="step">
+                <div class="step-header">
+                    <span class="step-number">4</span>
+                    <h2>Upload Initial Documents</h2>
+                </div>
+                <p>Upload necessary documents (e.g., previous transcripts, ID) through the student portal for verification.</p>
+            </div>
+
+            <div class="arrow"><i class="fas fa-arrow-down"></i></div>
+
+            <div class="step">
+                <div class="step-header">
+                    <span class="step-number">5</span>
+                    <h2>Document Verification</h2>
+                </div>
+                <p>The administration will verify the authenticity and completeness of your uploaded documents.</p>
+            </div>
+
+            <div class="arrow"><i class="fas fa-arrow-down"></i></div>
+
+            <div class="step">
+                <div class="step-header">
+                    <span class="step-number">6</span>
+                    <h2>On-Site Formalities & Payment</h2>
+                </div>
+                <p>Visit the school to submit hard copies of documents and complete the necessary payments at the cashier.</p>
+            </div>
+
+            <div class="arrow"><i class="fas fa-arrow-down"></i></div>
+
+            <div class="step">
+                <div class="step-header">
+                    <span class="step-number">7</span>
+                    <h2>Final Validation & Enrollment</h2>
+                </div>
+                <p>After payment confirmation and final document validation, your enrollment is complete! You'll receive your class schedule.</p>
+            </div>
+        </div>
     </div>
-
-    <div class="arrow">⬇</div>
-
-    <div class="step">
-        <h2>Step 2: Admin Approval</h2>
-        <p>Once registered, the admin will review and approve your application.</p>
-    </div>
-
-    <div class="arrow">⬇</div>
-
-    <div class="step">
-        <h2>Step 3: Login & Profile Completion</h2>
-        <p>Approved students will receive their login credentials via email. Log in and complete your profile.</p>
-    </div>
-
-    <div class="arrow">⬇</div>
-
-    <div class="step">
-        <h2>Step 4: Upload Initial Documents</h2>
-        <p>Upload the necessary initial documents required for verification.</p>
-    </div>
-
-    <div class="arrow">⬇</div>
-
-    <div class="step">
-        <h2>Step 5: Admin Verification</h2>
-        <p>The admin will review your documents and approve your application.</p>
-    </div>
-
-    <div class="arrow">⬇</div>
-
-    <div class="step">
-        <h2>Step 6: Submission of Hard Copies & Payment</h2>
-        <p>Visit the school to submit hard copies of documents and pay at the cashier.</p>
-    </div>
-
-    <div class="arrow">⬇</div>
-
-    <div class="step">
-        <h2>Step 7: Final Validation & Class Assignment</h2>
-        <p>After verifying payment and documents, you will receive your class schedule.</p>
-    </div>
-</div>
+</main>
 
 {% include 'myapp/footer.html' %}

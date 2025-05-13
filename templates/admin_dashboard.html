@@ -4,87 +4,187 @@
 {% block title %}All Applications - Admin Dashboard{% endblock %}
 
 {% block head %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/admin_dashboard.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/admin_dashboard.css' %}"> {# Keep if it has other essential styles #}
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <style>
-     .action-buttons {
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        gap: 6px;
-        flex-wrap: nowrap;
+    /* Inherit variables from admin_base.html or define here if admin_base doesn't have them */
+    :root {
+        /* These would ideally be in admin_base.html for consistency */
+        --content-card-bg: #ffffff;
+        --primary-accent: #007bff;
+        --danger-accent: #dc3545;
+        --success-accent: #28a745; /* Though accept button is removed, good to have */
+        --info-accent: #17a2b8;
+        --text-dark: #343a40;
+        --text-muted: #6c757d;
+        --border-color: #dee2e6;
+        --border-radius-md: .375rem; /* 8px */
+        --border-radius-lg: .5rem; /* 12px */
+        --box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        --box-shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     }
 
-    .btn {
-        padding: 6px 12px;
-        font-size: 13px;
+    .admin-dashboard-content {
+        background-color: var(--content-card-bg);
+        padding: 30px;
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--box-shadow);
+        /* min-height is ideally set on .main-content in admin_base.html or here if needed */
+    }
+
+    .admin-dashboard-content h1 {
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+    .admin-dashboard-content .page-description { /* Added class for the <p> tag */
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+    }
+
+    /* Table Styling */
+    .table-container {
+        overflow-x: auto; /* For responsiveness if table is too wide */
+    }
+    .table {
+        width: 100%;
+        margin-bottom: 1rem;
+        color: var(--text-dark);
+        border-collapse: collapse; /* Cleaner look */
+    }
+    .table th,
+    .table td {
+        padding: 0.9rem 0.75rem; /* Adjusted padding */
+        vertical-align: middle;
+        border-top: 1px solid var(--border-color);
+        font-size: 0.9rem;
+    }
+    .table thead th {
+        vertical-align: bottom;
+        border-bottom: 2px solid var(--border-color);
+        font-weight: 500;
+        background-color: #f8f9fa; /* Light header background */
+        color: var(--text-dark);
+    }
+    .table tbody tr:hover {
+        background-color: rgba(0,0,0,0.03); /* Subtle hover effect */
+    }
+
+    /* Application Status Styling */
+    .application-status {
+        padding: 0.3em 0.6em;
+        font-size: 0.8em;
+        font-weight: 600;
+        border-radius: var(--border-radius-md);
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        color: #fff;
+    }
+    .application-status.pending,
+    .application-status.submitted { /* Assuming 'submitted' is like 'pending' */
+        background-color: var(--info-accent);
+    }
+    .application-status.accepted {
+        background-color: var(--success-accent);
+    }
+    .application-status.rejected {
+        background-color: var(--danger-accent);
+    }
+    .application-status i {
+        font-size: 0.9em; /* Icon size relative to status text */
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 8px; /* Increased gap */
+        flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    }
+
+    .btn { /* General button styling from student dashboard */
+        padding: 0.375rem 0.75rem; /* Bootstrap sm padding */
+        font-size: 0.875rem; /* Bootstrap sm font-size */
         font-weight: 500;
         border: none;
-        border-radius: 6px;
+        border-radius: var(--border-radius-md);
         cursor: pointer;
         color: #fff;
-        transition: background-color 0.2s ease, transform 0.1s ease;
-        white-space: nowrap;
+        transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+        text-decoration: none; /* For <a> tags styled as buttons */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1.5;
     }
 
     .btn i {
         margin-right: 6px;
-    }
-
-    .btn-success {
-        background-color: #28a745;
-    }
-
-    .btn-danger {
-        background-color: #dc3545;
+        line-height: 1; /* Helps with vertical alignment */
     }
 
     .btn-primary {
-        background-color: #007bff;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
+        background-color: var(--primary-accent);
     }
-
-    .btn-success:hover {
-        background-color: #218838;
-    }
-
-    .btn-danger:hover {
-        background-color: #c82333;
-    }
-
     .btn-primary:hover {
-        background-color: #0069d9;
+        background-color: #0069d9; /* Darker primary */
     }
 
-    /* Align all form elements horizontally */
+    .btn-danger {
+        background-color: var(--danger-accent);
+    }
+    .btn-danger:hover {
+        background-color: #c82333; /* Darker danger */
+    }
+
+    /* Specific button for Send Email if it needs differentiation */
+    .btn-send-email {
+        background-color: var(--info-accent); /* Example using info color */
+    }
+    .btn-send-email:hover {
+        background-color: #138496; /* Darker info */
+    }
+
     .action-buttons form,
     .action-buttons a {
+        display: inline-block; /* Simpler display */
+        margin: 0; /* Remove default form margins */
+    }
+
+    .email-sent-status {
+        font-size: 0.8rem;
+        color: var(--success-accent);
         display: inline-flex;
         align-items: center;
+        gap: 4px;
+        margin-left: 8px;
+        white-space: nowrap;
+    }
+    .email-sent-status i {
+        font-size: 0.9em;
     }
 
-    /* Reduce delete button margin */
-    .action-buttons form:last-child {
-        margin-right: 0;
+    /* Alert styling (Bootstrap's default is usually good, but can be tweaked) */
+    .alert {
+        border-radius: var(--border-radius-md);
+        font-size: 0.9rem;
+    }
+    .alert-dismissible .btn-close {
+        padding: 0.75rem 1rem;
     }
 
-    /* Remove extra spacing caused by form block */
-    .action-buttons form,
-    .action-buttons a {
-        margin: 0;
-    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="admin-dashboard-content">
     <h1>All Applications</h1>
-    <p class="mb-4">Review and manage online applications submitted by prospective students.</p>
+    <p class="page-description mb-4">Review and manage online applications submitted by prospective students.</p>
 
     {% if messages %}
-    <div class="container mt-3">
+    <div class="container-fluid px-0 mb-3"> {# Use container-fluid and remove default padding for better fit #}
         {% for message in messages %}
             <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                 {{ message }}
@@ -96,7 +196,7 @@
 
     <div class="table-container">
         {% if applications %}
-            <table class="table">
+            <table class="table table-hover"> {# Added table-hover for Bootstrap's hover effect #}
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -109,16 +209,16 @@
                 <tbody>
                     {% for application in applications %}
                         <tr>
-                            <td>{{ application.first_name }} {{ application.middle_name }} {{ application.last_name }}</td>
+                            <td>{{ application.first_name }} {{ application.middle_name|default_if_none:"" }} {{ application.last_name }}</td>
                             <td>{{ application.email }}</td>
-                            <td>{{ application.application_date }}</td>
+                            <td>{{ application.application_date|date:"M d, Y" }}</td>
                             <td>
-                                <span class="application-status {{ application.status }}">
+                                <span class="application-status {{ application.status|lower }}">
                                     {% if application.status == 'accepted' %}
                                         <i class="fas fa-check-circle"></i>
                                     {% elif application.status == 'rejected' %}
                                         <i class="fas fa-times-circle"></i>
-                                    {% else %}
+                                    {% else %} {# Assuming 'pending' or 'submitted' #}
                                         <i class="fas fa-hourglass-half"></i>
                                     {% endif %}
                                     {{ application.get_status_display }}
@@ -126,18 +226,10 @@
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <form method="post" action="{% url 'accept_application' application.id %}">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Accept</button>
-                                    </form>
-                                    <form method="post" action="{% url 'reject_application' application.id %}">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-danger"><i class="fas fa-times"></i> Reject</button>
-                                    </form>
                                     <a href="{% url 'edit_application' application.id %}" class="btn btn-primary">
                                         <i class="fas fa-pen"></i> Edit
                                     </a>
-                                    <form method="post" action="{% url 'delete_application' application.id %}">
+                                    <form method="post" action="{% url 'delete_application' application.id %}" onsubmit="return confirm('Are you sure you want to delete this application?');">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</button>
                                     </form>
@@ -145,12 +237,12 @@
                                     {% if application.status == 'accepted' and application.student %}
                                         <form method="post" action="{% url 'send_account_email' application.student.id %}">
                                             {% csrf_token %}
-                                            <button type="submit" class="btn btn-primary">
+                                            <button type="submit" class="btn btn-send-email"> {# Custom class for send email #}
                                                 <i class="fas fa-envelope"></i> Send Email
                                             </button>
                                         </form>
                                         {% if application.student.email_sent %}
-                                            <span class="text-success" style="font-size: 12px;"><i class="fas fa-check-circle"></i> Email Sent</span>
+                                            <span class="email-sent-status"><i class="fas fa-check-circle"></i> Email Sent</span>
                                         {% endif %}
                                     {% endif %}
                                 </div>
@@ -165,4 +257,3 @@
     </div>
 </div>
 {% endblock %}
-

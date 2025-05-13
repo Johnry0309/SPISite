@@ -3,80 +3,417 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Student Dashboard{% endblock %}</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    {% block head %}{% endblock %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {% block head_extra_css %}{% endblock %}
     <style>
-        /* Include your sidebar and layout styles here */
+        :root {
+            --sidebar-bg: #014421;
+            --sidebar-bg-translucent: rgba(1, 68, 33, 0.95);
+            --sidebar-text-color: #e0e0e0;
+            --sidebar-text-hover-color: #ffffff;
+            --sidebar-active-bg: #002a13;
+            --sidebar-width: 260px;
+            --main-content-mica-bg: rgba(248, 249, 250, 0.7); /* Slightly more opaque for better readability behind content */
+            --main-content-mica-blur: 10px;
+            --content-card-bg: #ffffff;
+            --body-bg-fallback: #e9ecef;
+            --border-radius-md: 8px;
+            --border-radius-lg: 12px;
+            --primary-accent: #007bff; /* A general accent color */
+            --warning-accent: #ffc107; /* For pendings */
+            --info-accent: #17a2b8; /* For announcements */
+        }
+
         body {
             display: flex;
             min-height: 100vh;
             margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-image: url("{% static 'myapp/images/your_background_image.jpg' %}"); /* <<< CHANGE THIS */
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: var(--body-bg-fallback);
         }
 
         .sidebar {
-            width: 250px;
-            background-color: #014421;
-            color: white;
-            padding: 20px;
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg-translucent);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: var(--sidebar-text-color);
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: width 0.3s ease;
+            overflow-y: auto;
         }
 
-        .sidebar a {
-            color: white;
-            display: block;
-            padding: 10px 0;
-            text-decoration: none;
+        .sidebar-header {
+            text-align: center;
+            margin-bottom: 30px;
         }
 
         .sidebar-logo {
             width: 100px;
-            margin-bottom: 20px;
+            height: auto;
+            margin-bottom: 15px;
+            border-radius: 50%;
+            background-color: rgba(255,255,255,0.1);
+            padding: 5px;
+        }
+
+        .sidebar-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--sidebar-text-hover-color);
+            margin-bottom: 25px;
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-nav li a {
+            color: var(--sidebar-text-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            text-decoration: none;
+            border-radius: var(--border-radius-md);
+            transition: background-color 0.2s ease, color 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .sidebar-nav li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--sidebar-text-hover-color);
+        }
+        .sidebar-nav li a.active {
+            background-color: var(--sidebar-active-bg);
+            color: var(--sidebar-text-hover-color);
+            font-weight: 500;
+        }
+
+        .sidebar-nav li a i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1em;
+        }
+
+        .sidebar-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logout-button {
+            width: 100%;
+            background-color: #dc3545;
+            border-color: #dc3545;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+        .logout-button:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
         }
 
         .main-content {
             flex: 1;
-            padding: 20px;
-            background-color: #f8f9fa;
+            padding: 30px;
+            overflow-y: auto;
+            background-color: var(--main-content-mica-bg);
+            backdrop-filter: blur(var(--main-content-mica-blur));
+            -webkit-backdrop-filter: blur(var(--main-content-mica-blur));
+            border-radius: var(--border-radius-lg) 0 0 var(--border-radius-lg);
         }
 
         .main-content-card {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
+            background-color: var(--content-card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            min-height: calc(100vh - 60px);
         }
 
-        .logout-button {
-            margin-top: 20px;
+        .main-content-card h1, .main-content-card h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .main-content-card p {
+            line-height: 1.7;
+            color: #555;
+        }
+
+        /* Styles for Announcements and Pendings sections */
+        .dashboard-section {
+            margin-bottom: 30px;
+        }
+        .dashboard-section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #444;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .dashboard-section-header i {
+            color: var(--primary-accent);
+        }
+        .announcement-card, .pending-item-card {
+            background-color: #fdfdfd;
+            border: 1px solid #e7e7e7;
+            border-left-width: 4px;
+            margin-bottom: 15px;
+            transition: box-shadow 0.2s ease;
+        }
+        .announcement-card:hover, .pending-item-card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        }
+        .announcement-card {
+            border-left-color: var(--info-accent);
+        }
+        .pending-item-card {
+            border-left-color: var(--warning-accent);
+        }
+        .card-meta {
+            font-size: 0.85rem;
+            color: #777;
+            margin-bottom: 5px;
+        }
+        .pending-item-card .card-title a {
+            text-decoration: none;
+            color: var(--primary-blue-darker); /* From previous template, or use --primary-accent */
+        }
+        .pending-item-card .card-title a:hover {
+            text-decoration: underline;
+        }
+        .no-items-message {
+            color: #777;
+            font-style: italic;
+        }
+
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: center;
+                padding: 10px;
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+            }
+            .sidebar-header {
+                margin-bottom: 0;
+                display: flex;
+                align-items: center;
+            }
+            .sidebar-logo {
+                width: 40px;
+                margin-right: 10px;
+                margin-bottom: 0;
+            }
+            .sidebar-title {
+                font-size: 1rem;
+                margin-bottom: 0;
+                display: none;
+            }
+            .sidebar-nav ul {
+                display: flex;
+            }
+            .sidebar-nav li a {
+                padding: 8px 10px;
+                gap: 5px;
+            }
+             .sidebar-nav li a .link-text { display: none; }
+            .sidebar-nav li a i { font-size: 1.2em; }
+
+            .sidebar-footer {
+                margin-top: 0;
+                padding-top: 0;
+                border-top: none;
+            }
+            .logout-button {
+                padding: 6px 10px;
+                font-size: 0.9rem;
+            }
+            .main-content {
+                border-radius: 0;
+                padding: 15px;
+            }
+            .main-content-card {
+                padding: 20px;
+                min-height: calc(100vh - 70px - 30px); /* (height of sidebar mobile approx) - (padding) */
+            }
+             .dashboard-section-header {
+                font-size: 1.3rem;
+            }
         }
     </style>
+    {% block head %}{% endblock %}
 </head>
 <body>
     <div class="sidebar">
         <div>
-            <img src="{% static 'images/SPI_LOGO-removebg-preview.png' %}" alt="School Logo" class="sidebar-logo">
-            <h4>Student Menu</h4>
-            <ul>
-                <li><a href="{% url 'student_profile' %}"><i class="fas fa-user"></i> Profile</a></li>
-                <li><a href="{% url 'student_classes' %}"><i class="fas fa-book"></i> Classes</a></li>
-                <li><a href="#"><i class="fas fa-graduation-cap"></i> Grades</a></li>
-                <li><a href="#"><i class="fas fa-calendar-alt"></i> Schedule</a></li>
-            </ul>
+            <div class="sidebar-header">
+                <img src="{% static 'images/SPI_LOGO-removebg-preview.png' %}" alt="School Logo" class="sidebar-logo">
+                <h4 class="sidebar-title">Student Menu</h4>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="{% url 'student_profile' %}" class="{% if request.resolver_match.url_name == 'student_profile' %}active{% endif %}">
+                        <i class="fas fa-user"></i> <span class="link-text">Profile</span></a>
+                    </li>
+                    <li><a href="{% url 'student_classes' %}" class="{% if request.resolver_match.url_name == 'student_classes' %}active{% endif %}">
+                        <i class="fas fa-book"></i> <span class="link-text">Classes</span></a>
+                    </li>
+                    <li><a href="#" class="{% if request.resolver_match.url_name == 'student_grades' %}active{% endif %}">
+                        <i class="fas fa-graduation-cap"></i> <span class="link-text">Grades</span></a>
+                    </li>
+                    <li><a href="#" class="{% if request.resolver_match.url_name == 'student_schedule' %}active{% endif %}">
+                        <i class="fas fa-calendar-alt"></i> <span class="link-text">Schedule</span></a>
+                    </li>
+                </ul>
+            </nav>
         </div>
-        <form action="{% url 'logout' %}" method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger logout-button">Logout</button>
-        </form>
+        <div class="sidebar-footer">
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger logout-button w-100">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
+        </div>
     </div>
 
     <main class="main-content">
         <div class="main-content-card">
             {% block content %}
-            <!-- Default content shown only if not overridden -->
-            <h1>Welcome, {{ user.username }}!</h1>
-            <p>This is your student dashboard. Use the menu to explore your profile, classes, grades, and schedule.</p>
+            <!-- Default content: Welcome, Announcements, Pendings -->
+            <h1 class="mb-4">Welcome, {{ user.first_name|default:user.username|default:"Student" }}!</h1>
+
+            <div class="row">
+                <!-- Announcements Section -->
+                <div class="col-lg-6 dashboard-section">
+                    <div class="dashboard-section-header">
+                        <i class="fas fa-bullhorn" style="color: var(--info-accent);"></i>
+                        <span>Announcements</span>
+                    </div>
+                    {% if announcements %}
+                        {% for announcement in announcements %}
+                        <div class="card announcement-card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ announcement.title }}</h5>
+                                <p class="card-meta">
+                                    <i class="fas fa-calendar-alt"></i> {{ announcement.date_posted|date:"M d, Y" }}
+                                </p>
+                                <p class="card-text">{{ announcement.content|truncatewords:30 }}</p>
+                                {% if announcement.link %}
+                                <a href="{{ announcement.link }}" class="btn btn-sm btn-outline-info">Read More</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="no-items-message">No new announcements at this time.</p>
+                    {% endif %}
+
+                    <!-- Placeholder if no announcements from context -->
+                    {% if not announcements %}
+                    <div class="card announcement-card">
+                        <div class="card-body">
+                            <h5 class="card-title">System Maintenance Scheduled</h5>
+                            <p class="card-meta"><i class="fas fa-calendar-alt"></i> Oct 28, 2023</p>
+                            <p class="card-text">The student portal will be temporarily unavailable on Oct 30th from 2 AM to 4 AM for scheduled maintenance.</p>
+                        </div>
+                    </div>
+                    <div class="card announcement-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Mid-term Grades Posted</h5>
+                            <p class="card-meta"><i class="fas fa-calendar-alt"></i> Oct 25, 2023</p>
+                            <p class="card-text">Mid-term grades for all courses have now been posted. Please check your Grades section.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Pendings Section -->
+                <div class="col-lg-6 dashboard-section">
+                    <div class="dashboard-section-header">
+                        <i class="fas fa-clipboard-list" style="color: var(--warning-accent);"></i>
+                        <span>Pending Tasks</span>
+                    </div>
+                    {% if pendings %}
+                        {% for pending in pendings %}
+                        <div class="card pending-item-card">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    {% if pending.link %}<a href="{{ pending.link }}">{% endif %}
+                                    {{ pending.task_description }}
+                                    {% if pending.link %}</a>{% endif %}
+                                </h5>
+                                {% if pending.due_date %}
+                                <p class="card-meta">
+                                    <i class="fas fa-clock"></i> Due: {{ pending.due_date|date:"M d, Y" }}
+                                </p>
+                                {% endif %}
+                                {% if pending.details %}
+                                <p class="card-text">{{ pending.details|truncatewords:20 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="no-items-message">You have no pending tasks. Great job!</p>
+                    {% endif %}
+
+                    <!-- Placeholder if no pendings from context -->
+                    {% if not pendings %}
+                    <div class="card pending-item-card">
+                        <div class="card-body">
+                            <h5 class="card-title"><a href="#">Submit Math Assignment 3</a></h5>
+                            <p class="card-meta"><i class="fas fa-clock"></i> Due: Nov 02, 2023</p>
+                            <p class="card-text">Ensure your solutions for chapter 5 are submitted through the portal.</p>
+                        </div>
+                    </div>
+                    <div class="card pending-item-card">
+                        <div class="card-body">
+                            <h5 class="card-title"><a href="#">Library Book Return: "History of Science"</a></h5>
+                            <p class="card-meta"><i class="fas fa-clock"></i> Due: Oct 30, 2023</p>
+                        </div>
+                    </div>
+                     <div class="card pending-item-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Update Emergency Contact Info</h5>
+                             <p class="card-text">Please review and update your emergency contact information in your profile.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
             {% endblock %}
         </div>
     </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>
