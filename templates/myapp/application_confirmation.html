@@ -19,18 +19,42 @@
 {% block content %}
    <div class="admin-dashboard-content">
         <h1>Application Received!</h1>
-        <p>Thank you, {{ application.name }}, for submitting your application.</p>
 
-        <h2>Application Summary:</h2>
-        <ul>
-            <li><strong>Name:</strong> {{ application.name }}</li>
-            <li><strong>Email:</strong> {{ application.email }}</li>
-            <li><strong>Application Date:</strong> {{ application.application_date }}</li>
-            {# Add more application details here #}
-        </ul>
+        {% with full_name=application.first_name|add:" "|add:application.middle_name|default_if_none:""|add:" "|add:application.last_name %}
+            <p>Thank you, <strong>{{ full_name|title }}</strong>, for submitting your application.</p>
+
+            <h2>Application Summary:</h2>
+            <ul>
+                <li><strong>Full Name:</strong> {{ full_name|title }}</li>
+                <li><strong>Email:</strong> {{ application.email }}</li>
+                <li><strong>Phone Number:</strong> {{ application.phone_number }}</li> 
+                <li><strong>Desired Program:</strong> {{ application.desired_program.name }}</li>
+                <li><strong>Application Date:</strong> {{ application.application_date|date:"F d, Y" }}</li>
+             
+            </ul>
+        {% endwith %}
 
         <h2>Next Steps:</h2>
-        <p>Your application is currently under review. You will receive an email notification once a decision has been made. Please allow 4-5 days for processing.</p>
+        <p>Your application (ID: {{ application.id|default:"Not available" }}) is currently under review. You will receive an email notification once a decision has been made. Please allow 4-5 business days for processing.</p>
+        <p>If you have any urgent questions, please contact our admissions office at <a href="mailto:admissions@example.com">mktg.skillpowerinstitute@gmail.com</a> or call us at <a href="tel:+1234567890">(02) 8570-2298</a>.</p>
 
+        <p class="redirect-notice">You will be automatically redirected to the home page in <span id="countdown">10</span> seconds.</p>
     </div>
+
+    <script>
+        // Optional: Countdown timer display update
+        let secondsLeft = Math.floor(redirectTime / 1000);
+        const countdownElement = document.getElementById('countdown');
+        if (countdownElement) {
+            countdownElement.textContent = secondsLeft;
+            const countdownInterval = setInterval(function() {
+                secondsLeft--;
+                if (secondsLeft >= 0) {
+                    countdownElement.textContent = secondsLeft;
+                } else {
+                    clearInterval(countdownInterval);
+                }
+            }, 1000);
+        }
+    </script>
 {% endblock %}

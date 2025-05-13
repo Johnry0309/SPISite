@@ -26,9 +26,9 @@ class Application(models.Model):
     first_name = models.CharField(max_length=255, default=" ")
     middle_name = models.CharField(max_length=255, default=" ")
     last_name = models.CharField(max_length=255, default=" ")
-    email = models.EmailField(default="not_provided@example.com")
-    contact_number = models.CharField(max_length=15, default="0000000000")
-    previous_school = models.CharField(max_length=255, default="Unknown School")
+    email = models.EmailField(default="")
+    contact_number = models.CharField(max_length=15, default="")
+    previous_school = models.CharField(max_length=255, default="")
 
     house_number = models.CharField(max_length=100, default=" ")
     street_name = models.CharField(max_length=255, default=" ")
