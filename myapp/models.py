@@ -166,9 +166,9 @@ class Student(models.Model):
     email_sent = models.BooleanField(default=False)
     strand = models.CharField(max_length=100)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
-
     is_enrolled = models.BooleanField(default=False)
 
+    # Checklist booleans
     psa_birth_certificate = models.BooleanField(default=False)
     psa_marriage_certificate = models.BooleanField(default=False)
     form_138_137 = models.BooleanField(default=False)
@@ -178,8 +178,19 @@ class Student(models.Model):
     registration_form = models.BooleanField(default=False)
     cashier_payment = models.BooleanField(default=False)
 
+    # Document uploads
+    psa_birth_certificate_file = models.FileField(upload_to='documents/psa_birth/', null=True, blank=True)
+    psa_marriage_certificate_file = models.FileField(upload_to='documents/psa_marriage/', null=True, blank=True)
+    form_138_137_file = models.FileField(upload_to='documents/form_138/', null=True, blank=True)
+    certificate_of_good_moral_file = models.FileField(upload_to='documents/good_moral/', null=True, blank=True)
+    id_pictures_file = models.FileField(upload_to='documents/id_pictures/', null=True, blank=True)
+    long_envelopes_file = models.FileField(upload_to='documents/long_envelopes/', null=True, blank=True)
+    registration_form_file = models.FileField(upload_to='documents/registration_form/', null=True, blank=True)
+    cashier_payment_file = models.FileField(upload_to='documents/payment/', null=True, blank=True)
+
     def __str__(self):
         return self.full_name
+
 
 
 class ClassGroup(models.Model):

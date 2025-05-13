@@ -4,7 +4,17 @@ from .models import Application, Subject, Class, TeacherProfile, ClassAssignment
 class ProfilePictureForm(forms.ModelForm):
     class Meta:
         model = Student
-        fields = ['profile_picture']
+        fields = [
+            'profile_picture',
+            'psa_birth_certificate_file',
+            'psa_marriage_certificate_file',
+            'form_138_137_file',
+            'certificate_of_good_moral_file',
+            'id_pictures_file',
+            'long_envelopes_file',
+            'registration_form_file',
+            'cashier_payment_file',
+        ]
 
 class ApplicationForm(forms.ModelForm):
     class Meta:

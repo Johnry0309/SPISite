@@ -1261,6 +1261,7 @@ def admin_enrollment_dashboard(request):
 
 def get_student_details(request, student_id):
     student = get_object_or_404(Student, id=student_id)
+    
     checklist_fields = [
         'psa_birth_certificate',
         'psa_marriage_certificate',
@@ -1271,6 +1272,20 @@ def get_student_details(request, student_id):
         'registration_form',
         'cashier_payment'
     ]
+    
+    # Create a dictionary to store the file URLs for each checklist item
+    checklist_files = {}
+    for field in checklist_fields:
+        file_field = getattr(student, field, None)  # Get the field dynamically
+        
+        # Check if the field has a file uploaded
+        if file_field:
+            if hasattr(file_field, 'url'):  # Make sure it's a file field
+                checklist_files[field] = file_field.url
+            else:
+                checklist_files[field] = None  # Not a file, or field is empty
+        else:
+            checklist_files[field] = None  # No file uploaded
 
     # Extract status message from the query parameters
     status_message = request.GET.get('status_message')
@@ -1278,6 +1293,7 @@ def get_student_details(request, student_id):
     return render(request, 'student_checklist_detail.html', {
         'student': student,
         'checklist_fields': checklist_fields,
+        'checklist_files': checklist_files,
         'status_message': status_message,
     })
 

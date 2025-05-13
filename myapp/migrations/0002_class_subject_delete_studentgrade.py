@@ -3,7 +3,6 @@
 import django.db.models.deletion
 from django.db import migrations, models
 
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -14,7 +13,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='class',
             name='subject',
-            field=models.ForeignKey(default='no related subject', on_delete=django.db.models.deletion.CASCADE, to='myapp.subject'),
+            field=models.ForeignKey(
+                null=True,
+                blank=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to='myapp.subject'
+            ),
             preserve_default=False,
         ),
         migrations.DeleteModel(
