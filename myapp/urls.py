@@ -82,6 +82,7 @@ urlpatterns = [
     path('printables/', views.printables, name='printables'),
 
 
+
     
     # Applications
     path('confirmation/<int:application_id>/', views.application_confirmation, name='application_confirmation'),

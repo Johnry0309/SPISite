@@ -1,0 +1,44 @@
+<h2>Student: {{ student.full_name }}</h2>
+<p><strong>Email:</strong> {{ student.email }}</p>
+
+<div id="checklist-message" style="display:none;" class="alert alert-success"></div>
+
+<h4>Uploaded Documents</h4>
+
+<ul class="list-group mb-4">
+    <li class="list-group-item">
+        <strong>PSA Birth Certificate:</strong>
+        {% if student.psa_birth_certificate_file %}
+            ✅ <a href="{{ student.psa_birth_certificate_file.url }}" target="_blank">View</a>
+        {% else %}
+            🟥 Not uploaded
+        {% endif %}
+    </li>
+    <li class="list-group-item">
+        <strong>PSA Marriage Certificate:</strong>
+        {% if student.psa_marriage_certificate_file %}
+            ✅ <a href="{{ student.psa_marriage_certificate_file.url }}" target="_blank">View</a>
+        {% else %}
+            🟥 Not uploaded
+        {% endif %}
+    </li>
+    <li class="list-group-item">
+        <strong>Form 138/137:</strong>
+        {% if student.form_138_137_file %}
+            ✅ <a href="{{ student.form_138_137_file.url }}" target="_blank">View</a>
+        {% else %}
+            🟥 Not uploaded
+        {% endif %}
+    </li>
+    <li class="list-group-item">
+        <strong>Certificate of Good Moral:</strong>
+        {% if student.certificate_of_good_moral_file %}
+            ✅ <a href="{{ student.certificate_of_good_moral_file.url }}" target="_blank">View</a>
+        {% else %}
+            🟥 Not uploaded
+        {% endif %}
+    </li>
+</ul>
+
+<!-- Enroll Button -->
+<button onclick="enrollStudent({{ student.id }})" class="btn btn-success">Enroll Student</button>

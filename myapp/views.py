@@ -1409,3 +1409,6 @@ def printables(request):
     return render(request, 'printables.html', context)
 
 
+def get_student_details(request, student_id):
+    student = get_object_or_404(Student, id=student_id)
+    return render(request, 'partials/student_detail.html', {'student': student})

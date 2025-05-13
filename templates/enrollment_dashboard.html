@@ -6,13 +6,11 @@
 {% block content %}
 <h1>Enrollment Dashboard</h1>
 
-<!-- Search Form -->
 <form id="filters-form" method="GET" class="mb-4">
     <input type="text" name="q" id="search-query" value="{{ query }}" placeholder="Search by Name or Email" class="form-control mb-2" />
     <button type="submit" class="btn btn-primary">Search</button>
 </form>
 
-<!-- Student List -->
 {% if students %}
     <h4>Search Results:</h4>
     <ul class="list-group mb-4" id="student-results">
@@ -26,8 +24,11 @@
     <p>No students found matching "{{ query }}".</p>
 {% endif %}
 
-<!-- Student Details (loaded by JS) -->
+<!-- Student Details (loaded via JS) -->
 <div id="student-detail-container"></div>
+
+<!-- Needed for fetch() CSRF headers -->
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 
 <script>
 function loadStudentDetails(studentId) {
@@ -42,36 +43,6 @@ function loadStudentDetails(studentId) {
     });
 }
 
-function submitChecklist(studentId) {
-    const form = document.getElementById('document-form');
-    const formData = new FormData(form);
-
-    fetch(`/update-documents/${studentId}/`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
-        }
-    })
-    .then(response => {
-        console.log('Response received for checklist save:', response);
-        if (response.ok) {
-            response.json().then(data => {
-                console.log(data); // Log response data
-                const message = document.getElementById('checklist-message');
-                message.style.display = 'block'; // Show the success message
-                message.innerText = 'Checklist saved successfully!';
-            });
-        } else {
-            alert("Failed to save checklist.");
-        }
-    })
-    .catch(error => {
-        alert("Something went wrong.");
-        console.error(error);
-    });
-}
-
 function enrollStudent(studentId) {
     fetch(`/enroll-student/${studentId}/`, {
         method: 'POST',
@@ -79,18 +50,11 @@ function enrollStudent(studentId) {
             'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
         }
     })
-    .then(response => {
-        console.log('Response received for student enrollment:', response);
-        if (response.ok) {
-            response.json().then(data => {
-                console.log(data); // Log response data
-                const message = document.getElementById('checklist-message');
-                message.style.display = 'block'; // Show the success message
-                message.innerText = 'Student enrolled successfully!';
-            });
-        } else {
-            alert("Enrollment failed.");
-        }
+    .then(response => response.json())
+    .then(data => {
+        const message = document.getElementById('checklist-message');
+        message.style.display = 'block';
+        message.innerText = 'Student enrolled successfully!';
     })
     .catch(error => {
         alert("Something went wrong.");
@@ -98,5 +62,4 @@ function enrollStudent(studentId) {
     });
 }
 </script>
-
 {% endblock %}
