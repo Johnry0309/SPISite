@@ -1412,3 +1412,27 @@ def printables(request):
 def get_student_details(request, student_id):
     student = get_object_or_404(Student, id=student_id)
     return render(request, 'partials/student_detail.html', {'student': student})
+
+
+@csrf_exempt
+def update_checklist(request, student_id):
+    student = get_object_or_404(Student, id=student_id)
+
+    if request.method == 'POST':
+        # Update checklist fields based on the POST data
+        student.psa_birth_certificate = 'psa_birth_certificate_checked' in request.POST
+        student.psa_marriage_certificate = 'psa_marriage_certificate_checked' in request.POST
+        student.form_138_137 = 'form_138_137_checked' in request.POST
+        student.certificate_of_good_moral = 'certificate_of_good_moral_checked' in request.POST
+        student.id_pictures = 'id_pictures_checked' in request.POST
+        student.long_envelopes = 'long_envelopes_checked' in request.POST
+        student.registration_form = 'registration_form_checked' in request.POST
+        student.cashier_payment = 'cashier_payment_checked' in request.POST
+
+        # Save the updated student object
+        student.save()
+
+        # Respond with a success message
+        return JsonResponse({'success': True, 'message': 'Checklist updated successfully!'}, status=200)
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
