@@ -10,7 +10,6 @@ class Application(models.Model):
 
     STRAND_CHOICES = [
         ('ABM', 'ABM'),
-        ('GAS', 'GAS'),
         ('HUMMS', 'HUMMS'),
         ('HRM', 'HRM'),
         ('TM', 'TM'),
@@ -43,7 +42,7 @@ class Application(models.Model):
     strand = models.CharField(
         max_length=10,
         choices=STRAND_CHOICES,
-        default='GAS',
+        default='ABM',
         help_text="Strand for which the student is applying"
     )
 
