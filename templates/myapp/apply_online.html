@@ -204,6 +204,13 @@
                         <div class="text-danger">{% for error in form.last_name.errors %}{{ error }}{% endfor %}</div>
                     {% endif %}
                 </div>
+                <div class="col-md-4 mb-3">
+                <label for="{{ form.suffix.id_for_label }}" class="form-label">Suffix (Optional):</label>
+                {{ form.suffix|add_class:"form-control" }}
+                {% if form.suffix.errors %}
+                    <div class="text-danger">{% for error in form.suffix.errors %}{{ error }}{% endfor %}</div>
+                {% endif %}
+            </div>
             </div>
             <!-- Level Selection -->
             <div class="mb-3">
@@ -302,6 +309,14 @@
                 {{ form.previous_school|add_class:"form-control" }}
                 {% if form.previous_school.errors %}
                     <div class="text-danger">{% for error in form.previous_school.errors %}{{ error }}{% endfor %}</div>
+                {% endif %}
+            </div>
+          <h5 class="mt-4">Guardian Information</h5>
+            <div class="mb-3">
+                <label for="{{ form.guardian_name.id_for_label }}" class="form-label">Guardian's Full Name:</label>
+                {{ form.guardian_name|add_class:"form-control" }}
+                {% if form.guardian_name.errors %}
+                    <div class="text-danger">{% for error in form.guardian_name.errors %}{{ error }}{% endfor %}</div>
                 {% endif %}
             </div>
 

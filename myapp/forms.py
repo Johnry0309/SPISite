@@ -8,7 +8,8 @@ class ProfilePictureForm(forms.ModelForm):
             'profile_picture',
             'psa_birth_certificate_file',
             'psa_marriage_certificate_file',
-            'form_138_137_file',
+            'form_137_file',
+            'form_138_file',
             'certificate_of_good_moral_file',
             'id_pictures_file',
             'long_envelopes_file',
@@ -22,13 +23,14 @@ class ApplicationForm(forms.ModelForm):
         fields = [
             'first_name', 'middle_name', 'last_name', 'email', 'contact_number', 'previous_school',
             'house_number', 'street_name', 'barangay', 'city_municipality', 'province', 'country',
-            'strand', 'level'
+            'strand', 'level', 'guardian_name', 'suffix',
         ]
 
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
             'middle_name': forms.TextInput(attrs={'class': 'form-control'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'suffix': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'contact_number': forms.TextInput(attrs={'class': 'form-control'}),
             'previous_school': forms.TextInput(attrs={'class': 'form-control'}),
@@ -40,6 +42,7 @@ class ApplicationForm(forms.ModelForm):
             'country': forms.TextInput(attrs={'class': 'form-control'}),
             'strand': forms.Select(attrs={'class': 'form-control'}),
             'level': forms.Select(attrs={'class': 'form-control'}),
+            'guardian_name': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
     # Custom field validation

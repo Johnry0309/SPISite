@@ -26,6 +26,7 @@ class Application(models.Model):
     first_name = models.CharField(max_length=255, default=" ")
     middle_name = models.CharField(max_length=255, default=" ")
     last_name = models.CharField(max_length=255, default=" ")
+    suffix = models.CharField(max_length=255, default=" ")
     email = models.EmailField(default="")
     contact_number = models.CharField(max_length=15, default="")
     previous_school = models.CharField(max_length=255, default="")
@@ -36,6 +37,8 @@ class Application(models.Model):
     city_municipality = models.CharField(max_length=255, default=" ")
     province = models.CharField(max_length=255, blank=True, null=True)
     country = models.CharField(max_length=100, default="Philippines")
+    guardian_name= models.CharField(max_length=255, default=" ")
+  
 
     strand = models.CharField(
         max_length=10,
@@ -176,7 +179,8 @@ class Student(models.Model):
     # Checklist booleans
     psa_birth_certificate = models.BooleanField(default=False)
     psa_marriage_certificate = models.BooleanField(default=False)
-    form_138_137 = models.BooleanField(default=False)
+    form_137 = models.BooleanField(default=False)
+    form_138 = models.BooleanField(default=False)
     certificate_of_good_moral = models.BooleanField(default=False)
     id_pictures = models.BooleanField(default=False)
     long_envelopes = models.BooleanField(default=False)
@@ -186,7 +190,8 @@ class Student(models.Model):
     # Document uploads
     psa_birth_certificate_file = models.FileField(upload_to='documents/psa_birth/', null=True, blank=True)
     psa_marriage_certificate_file = models.FileField(upload_to='documents/psa_marriage/', null=True, blank=True)
-    form_138_137_file = models.FileField(upload_to='documents/form_138/', null=True, blank=True)
+    form_137_file = models.FileField(upload_to='documents/form_138/', null=True, blank=True)
+    form_138_file = models.FileField(upload_to='documents/form_138/', null=True, blank=True)
     certificate_of_good_moral_file = models.FileField(upload_to='documents/good_moral/', null=True, blank=True)
     id_pictures_file = models.FileField(upload_to='documents/id_pictures/', null=True, blank=True)
     long_envelopes_file = models.FileField(upload_to='documents/long_envelopes/', null=True, blank=True)

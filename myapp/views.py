@@ -1243,7 +1243,8 @@ def update_documents(request, student_id):
         fields = [
             'psa_birth_certificate',
             'psa_marriage_certificate',
-            'form_138_137',
+            'form_137',
+            'form_138',
             'certificate_of_good_moral',
             'id_pictures',
             'long_envelopes',
@@ -1279,7 +1280,8 @@ def get_student_details(request, student_id):
     checklist_fields = [
         'psa_birth_certificate',
         'psa_marriage_certificate',
-        'form_138_137',
+        'form_137',
+        'form_138',
         'certificate_of_good_moral',
         'id_pictures',
         'long_envelopes',
@@ -1440,7 +1442,8 @@ def update_checklist(request, student_id):
         # Update checklist fields based on the POST data
         student.psa_birth_certificate = 'psa_birth_certificate_checked' in request.POST
         student.psa_marriage_certificate = 'psa_marriage_certificate_checked' in request.POST
-        student.form_138_137 = 'form_138_137_checked' in request.POST
+        student.form_137 = 'form_137_checked' in request.POST
+        student.form_138 = 'form_138_checked' in request.POST
         student.certificate_of_good_moral = 'certificate_of_good_moral_checked' in request.POST
         student.id_pictures = 'id_pictures_checked' in request.POST
         student.long_envelopes = 'long_envelopes_checked' in request.POST

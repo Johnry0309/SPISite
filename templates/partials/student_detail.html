@@ -23,9 +23,17 @@
         {% endif %}
     </li>
     <li class="list-group-item">
-        <strong>Form 138/137:</strong>
+        <strong>Form 137:</strong>
         {% if student.form_138_137_file %}
-            ✅ <a href="{{ student.form_138_137_file.url }}" target="_blank">View</a>
+            ✅ <a href="{{ student.form_137_file.url }}" target="_blank">View</a>
+        {% else %}
+            🟥 Not uploaded
+        {% endif %}
+    </li>
+        <li class="list-group-item">
+        <strong>Form 138:</strong>
+        {% if student.form_138_137_file %}
+            ✅ <a href="{{ student.form_138_file.url }}" target="_blank">View</a>
         {% else %}
             🟥 Not uploaded
         {% endif %}

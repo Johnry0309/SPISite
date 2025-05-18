@@ -226,7 +226,7 @@
         </div>
 
         <div class="doc-upload-box">
-            <label class="doc-label">Form 138/137</label>
+            <label class="doc-label">Form 137</label>
             <div class="doc-status {% if student.form_138_137_file %}uploaded{% else %}not-uploaded{% endif %}">
                 {% if student.form_138_137_file %}
                     ✅ Uploaded: <a href="{{ student.form_138_137_file.url }}" target="_blank">View file</a>
@@ -234,7 +234,18 @@
                     🟥 Not uploaded
                 {% endif %}
             </div>
-            {{ form.form_138_137_file }}
+            {{ form.form_137_file }}
+        </div>
+                <div class="doc-upload-box">
+            <label class="doc-label">Form 138</label>
+            <div class="doc-status {% if student.form_138_137_file %}uploaded{% else %}not-uploaded{% endif %}">
+                {% if student.form_138_137_file %}
+                    ✅ Uploaded: <a href="{{ student.form_138_137_file.url }}" target="_blank">View file</a>
+                {% else %}
+                    🟥 Not uploaded
+                {% endif %}
+            </div>
+            {{ form.form_138_file }}
         </div>
 
         <div class="doc-upload-box">
@@ -273,10 +284,10 @@
         <strong>Certificate of Good Moral</strong>
     </li>
     <li class="list-group-item">
-        <strong>ID Pictures</strong>
+        <strong>ID Pictures(2pcs 2x2 and 2pcs 1x1)</strong>
     </li>
     <li class="list-group-item">
-        <strong>Long Envelopes</strong>
+        <strong>Long Brown Envelop with Plastic cover</strong>
     </li>
     <li class="list-group-item">
         <strong>Registration Form</strong>
