@@ -137,10 +137,15 @@ class ClassAssignment(models.Model):
 class Grade(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE)
     subject = models.ForeignKey(Class, on_delete=models.CASCADE)
-    grade = models.FloatField()
+    prelim = models.FloatField(null=True, blank=True)
+    midterm = models.FloatField(null=True, blank=True)
+    prefinals = models.FloatField(null=True, blank=True)
+    finals = models.FloatField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.student.username} - {self.subject.subject_name}: {self.grade}"
+        return f"{self.student.username} - {self.subject.subject_name}: " \
+               f"Prelim {self.prelim}, Midterm {self.midterm}, " \
+               f"Prefinals {self.prefinals}, Finals {self.finals}"
 
 
 class Announcement(models.Model):

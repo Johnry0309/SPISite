@@ -336,50 +336,55 @@ def login_view(request):
 
 @login_required(login_url='/login/')
 def teacher_dashboard(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
-
     if not request.user.is_staff:
         return redirect('student_dashboard')
 
     user = request.user
     profile, created = TeacherProfile.objects.get_or_create(user=user)
 
-    # Handle profile update
-    if 'update_profile' in request.POST:
-        user.first_name = request.POST.get('first_name', '')
-        user.last_name = request.POST.get('last_name', '')
-        user.save()
+    if request.method == 'POST':
 
-        user.middle_name = request.POST.get('middle_name', '')
-        profile.address = request.POST.get('address', '')
-        profile.specialization = request.POST.get('specialization', '')
-        profile.save()
+        # Profile update form
+        if 'update_profile' in request.POST:
+            user.first_name = request.POST.get('first_name', '').strip()
+            user.last_name = request.POST.get('last_name', '').strip()
+            user.save()
 
-        return redirect('teacher_dashboard')
+            profile.middle_name = request.POST.get('middle_name', '').strip()
+            profile.address = request.POST.get('address', '').strip()
+            profile.specialization = request.POST.get('specialization', '').strip()
+            profile.save()
 
-    # Handle grade submission
-    if 'submit_grade' in request.POST:
-        student_id = request.POST.get('student')
-        subject_id = request.POST.get('subject')
-        grade_value = request.POST.get('grade')
+            return redirect('teacher_dashboard')
 
-        print("POST data:", request.POST)
+        # Grade submission form - with prelim, midterm, prefinals, finals
+        elif 'submit_grade' in request.POST:
+            student_id = request.POST.get('student')
+            subject_id = request.POST.get('subject')
+            prelim = request.POST.get('prelim')
+            midterm = request.POST.get('midterm')
+            prefinals = request.POST.get('prefinals')
+            finals = request.POST.get('finals')
 
-        student = get_object_or_404(User, id=student_id)
-        subject_class = get_object_or_404(Class, id=subject_id)
+            student = get_object_or_404(User, id=student_id)
+            subject = get_object_or_404(Class, id=subject_id)
 
-        grade_obj, created = Grade.objects.update_or_create(
-            student=student,
-            subject=subject_class,
-            defaults={'grade': grade_value}
-        )
+            grade_obj, created = Grade.objects.get_or_create(student=student, subject=subject)
 
-        print("Grade saved:", grade_obj.grade, "New?", created)
+            if prelim:
+                grade_obj.prelim = float(prelim)
+            if midterm:
+                grade_obj.midterm = float(midterm)
+            if prefinals:
+                grade_obj.prefinals = float(prefinals)
+            if finals:
+                grade_obj.finals = float(finals)
 
-        return redirect('teacher_dashboard')
+            grade_obj.save()
 
-    # Load class, student, grade data
+            return redirect('teacher_dashboard')
+
+    # GET request, or no form submitted
     classes = Class.objects.filter(teacher=user)
     students = User.objects.filter(enrolled_classes__in=classes).distinct()
     grades = Grade.objects.filter(subject__in=classes)
@@ -389,7 +394,6 @@ def teacher_dashboard(request):
         'profile': profile,
         'classes': classes,
         'students': students,
-        'subjects': classes,  # If still used in your template
         'grades': grades,
     })
 
@@ -410,20 +414,30 @@ def teacher_profile(request):
     if request.method == "POST":
         student_id = request.POST.get('student')
         subject_id = request.POST.get('subject')
-        grade = request.POST.get('grade')
+        prelim = request.POST.get('prelim')
+        midterm = request.POST.get('midterm')
+        prefinals = request.POST.get('prefinals')
+        finals = request.POST.get('finals')
 
         print("POST data:", request.POST)
 
         student = get_object_or_404(User, id=student_id)
         subject_class = get_object_or_404(Class, id=subject_id)
 
-        grade_obj, created = Grade.objects.update_or_create(
-            student=student,
-            subject=subject_class,
-            defaults={'grade': grade}
-        )
+        grade_obj, created = Grade.objects.get_or_create(student=student, subject=subject_class)
 
-        print("Grade saved:", grade_obj.grade, "New?", created)
+        if prelim:
+            grade_obj.prelim = float(prelim)
+        if midterm:
+            grade_obj.midterm = float(midterm)
+        if prefinals:
+            grade_obj.prefinals = float(prefinals)
+        if finals:
+            grade_obj.finals = float(finals)
+
+        grade_obj.save()
+
+        print("Grade saved:", grade_obj.__dict__, "New?", created)
 
         return redirect('teacher_profile')
 
@@ -433,6 +447,7 @@ def teacher_profile(request):
         'subjects': classes,
         'grades': grades,
     })
+
 
 def custom_logout_view(request):
     logout(request)  # Logs out the user
