@@ -18,16 +18,15 @@
 
     <style>
         :root {
-    --primary-gold: gold; /* #FFD700 */
-    --dark-gold-hover: darkgoldenrod; /* #B8860B */
-    --text-dark-button: black; /* Or a very dark gray #212529 */
-    --text-light-button-hover: white; /* Or a very light gray #f8f9fa */
+            --primary-gold: gold;
+            --dark-gold-hover: darkgoldenrod;
+            --text-dark-button: black;
+            --text-light-button-hover: white;
+            --section-vertical-padding: 60px;
+            --section-horizontal-padding: 20px;
+            --button-section-bottom-margin: 40px;
+        }
 
-    /* Spacing: Define how much space you want */
-    --section-vertical-padding: 60px; /* e.g., 60px top and bottom padding for sections */
-    --section-horizontal-padding: 20px; /* e.g., 20px left and right padding */
-    --button-section-bottom-margin: 40px; /* Space AFTER the apply button container */
-}
         .announcement-carousel-wrapper {
             overflow: hidden;
             border: 1px solid #cccccc69;
@@ -107,71 +106,66 @@
         }
 
         .video-container video {
-            width: 40%;
+            width: 80%;
+            max-width: 960px;
+            height: auto;
             border-radius: 15px;
             box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
         }
 
         .apply-btn-container {
-    text-align: center;
-    padding-top: 30px; /* Space above the button */
-    padding-bottom: var(--button-section-bottom-margin); /* Space below the button container */
-    /* Optional: give it a distinct background if it's its own visual block */
-    /* background-color: #f8f9fa; */
-}
+            text-align: center;
+            padding-top: 30px;
+            padding-bottom: var(--button-section-bottom-margin);
+        }
 
-.apply-btn {
-    background-color: var(--primary-gold);
-    color: var(--text-dark-button);
-    padding: 15px 35px; /* Slightly more horizontal padding */
-    font-size: clamp(1.3rem, 3vw, 1.8rem); /* Responsive font size */
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: bold;
-    display: inline-block;
-    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    border: 2px solid transparent; /* For focus state */
-}
+        .apply-btn {
+            background-color: var(--primary-gold);
+            color: var(--text-dark-button);
+            padding: 15px 35px;
+            font-size: clamp(1.3rem, 3vw, 1.8rem);
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border: 2px solid transparent;
+        }
 
-.apply-btn:hover, .apply-btn:focus {
-    background-color: var(--dark-gold-hover);
-    color: var(--text-light-button-hover); /* Ensure contrast on hover */
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-    outline: none;
-}
-.apply-btn:focus-visible { /* Clearer focus for accessibility */
-    outline: 2px solid var(--dark-gold-hover);
-    outline-offset: 2px;
-    box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.4);
-}
-.scroll-section {
-    /* CRITICAL FIX: Add padding inside each scroll section */
-    padding-top: var(--section-vertical-padding);
-    padding-bottom: var(--section-vertical-padding);
-    padding-left: var(--section-horizontal-padding);
-    padding-right: var(--section-horizontal-padding);
+        .apply-btn:hover,
+        .apply-btn:focus {
+            background-color: var(--dark-gold-hover);
+            color: var(--text-light-button-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+            outline: none;
+        }
 
-    /* margin-top: 0; /* This is fine if the element above it (like .apply-btn-container) handles the bottom spacing */
-    transition: background-color 0.5s ease-in-out;
-}
+        .apply-btn:focus-visible {
+            outline: 2px solid var(--dark-gold-hover);
+            outline-offset: 2px;
+            box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.4);
+        }
 
-/* Ensure content within .scroll-section has some constraints for readability */
-.scroll-section > * { /* Targets direct children */
-    max-width: 900px; /* Example max-width for content inside */
-    margin-left: auto;
-    margin-right: auto;
-}
+        .scroll-section {
+            padding: var(--section-vertical-padding) var(--section-horizontal-padding);
+            transition: background-color 0.5s ease-in-out;
+        }
 
+        .scroll-section > * {
+            max-width: 900px;
+            margin: 0 auto;
+        }
 
-.scroll-section:nth-child(odd) {
-    background-color: rgba(0,128,0,0.08); /* Slightly adjusted opacity */
-}
+        .scroll-section:nth-child(odd) {
+            background-color: rgba(0,128,0,0.08);
+        }
 
-.scroll-section:nth-child(even) {
-    background-color: rgba(255,215,0,0.08); /* Slightly adjusted opacity */
-}
+        .scroll-section:nth-child(even) {
+            background-color: rgba(255,215,0,0.08);
+        }
+
         .swiper-container {
             width: 80%;
             max-width: 800px;
@@ -192,9 +186,14 @@
             border-radius: 10px;
         }
 
+        .carousel,
+        .carousel-inner,
+        .carousel-item {
+            background-color: transparent !important;
+        }
+
         .carousel-inner {
             min-height: 400px;
-            background-color: #f8f9fa;
         }
 
         .carousel-inner .carousel-item img {
@@ -203,11 +202,6 @@
             height: 400px;
             object-position: center;
         }
-        .carousel,
-        .carousel-inner,
-        .carousel-item {
-            background-color: transparent !important;
-        }
     </style>
 </head>
 <body>
@@ -215,7 +209,7 @@
     {% include 'myapp/nav.html' %}
     {% block content %}
 
-    <!-- Image Carousel Section -->
+    <!-- Bootstrap Image Carousel -->
     <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
             {% for image in carousel_images %}
@@ -228,11 +222,11 @@
         </div>
     </div>
 
-    <!-- Announcement Carousel -->
+    <!-- Scrolling Announcements -->
     <div class="container py-5">
         <div class="announcement-carousel-wrapper">
             {% if announcements %}
-                <div class="announcement-carousel" id="announcement-carousel">
+                <div class="announcement-carousel">
                     {% for announcement in announcements %}
                         <div class="announcement-slide">
                             <a href="{% url 'announcement_page' announcement.id %}" class="carousel-link">
@@ -248,10 +242,10 @@
         </div>
     </div>
 
-    <!-- Choose SPI Title -->
+    <!-- Heading -->
     <h2 class="choose-spi">Choose SPI</h2>
 
-    <!-- Video Section -->
+    <!-- Video -->
     <div class="video-container">
         <video controls autoplay loop>
             <source src="{% static 'videos/SPI_Antipolo.mp4' %}" type="video/mp4">
@@ -259,12 +253,12 @@
         </video>
     </div>
 
-    <!-- Apply Now Button -->
+    <!-- Apply Button -->
     <div class="apply-btn-container">
         <a href="{% url 'apply_online' %}" class="apply-btn">Apply Now</a>
     </div>
 
-    <!-- Image Slider -->
+    <!-- Swiper Slider -->
     <div class="scroll-section text-center">
         <div class="swiper-container">
             <div class="swiper-wrapper">
@@ -287,22 +281,30 @@
     {% endblock %}
     {% include 'myapp/footer.html' %}
 
-    <!-- Bootstrap & Swiper JS -->
+    <!-- Bootstrap and Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
 
     <script>
-        var swiper = new Swiper('.swiper-container', {
+        // Swiper initialization
+        const swiper = new Swiper('.swiper-container', {
             loop: true,
-            autoplay: { delay: 3000 },
+            autoplay: {
+                delay: 3000,
+                disableOnInteraction: false
+            },
             slidesPerView: 1,
-            centeredSlides: true,
+            centeredSlides: true
         });
 
-        var myCarousel = new bootstrap.Carousel(document.querySelector('#carouselExample'), {
-            interval: 4000,
-            ride: 'carousel'
-        });
+        // Optional: reinit Bootstrap carousel (already works with data-bs-ride)
+        const carouselEl = document.querySelector('#carouselExample');
+        if (carouselEl) {
+            new bootstrap.Carousel(carouselEl, {
+                interval: 3000,
+                ride: 'carousel'
+            });
+        }
     </script>
 </body>
 </html>

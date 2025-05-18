@@ -858,11 +858,12 @@ def application_confirmation(request, application_id):
 
 def edit_application(request, application_id):
     application = get_object_or_404(Application, pk=application_id)
-    student = application.student if application.student else None
-    user = student.user if student else None
 
-    generated_password = student.generated_password if student else None
-    user_id = user.id if user else None
+    student = getattr(application, 'student', None)
+    user = getattr(student, 'user', None) if student else None
+
+    generated_password = getattr(student, 'generated_password', '') if student else ''
+    user_id = getattr(user, 'id', '') if user else ''
 
     if request.method == 'POST':
         # Update Application fields
@@ -881,13 +882,12 @@ def edit_application(request, application_id):
         application.status = request.POST.get('status')
         application.save()
 
-        # Update user and student fields
         if student and user:
             user.username = request.POST.get('username')
             user.email = application.email
             user.save()
 
-            student.email = application.email  # Sync student email
+            student.email = application.email  # Keep synced
 
             new_password = request.POST.get('password')
             if new_password:
@@ -895,7 +895,7 @@ def edit_application(request, application_id):
                 user.save()
                 student.generated_password = new_password
 
-            student.save()  # Save once after all updates
+            student.save()
 
         messages.success(request, "Application updated successfully.")
         return redirect('admin_dashboard')
@@ -905,7 +905,6 @@ def edit_application(request, application_id):
         'generated_password': generated_password,
         'user_id': user_id
     })
-
 
 def contact(request):
     if request.method == 'POST':

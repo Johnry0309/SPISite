@@ -94,8 +94,13 @@
                 <table>
                     <tr>
                         <th>Username</th>
-                        <td><input type="text" name="username" class="form-control" value="{{ application.student.user.username }}"></td>
-                    </tr>
+<td>
+    {% if application.student %}
+        <input type="text" name="username" class="form-control" value="{{ application.student.user.username }}">
+    {% else %}
+        <input type="text" name="username" class="form-control" value="" placeholder="No student linked">
+    {% endif %}
+</td>                    </tr>
                     <tr>
                         <th>First Name</th>
                         <td><input type="text" name="first_name" class="form-control" value="{{ application.first_name }}"></td>
