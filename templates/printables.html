@@ -178,28 +178,28 @@
         </div>
 
         <table>
-            <thead>
-                <tr>
-                    <th>Subject</th>
-                    <th>Subject Code</th>
-                    <th>Strand</th>
-                    <th>Year</th>
-                    <th>Semester</th>
-                    <th>Grade</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for entry in subjects_with_grades %}
-                <tr>
-                    <td>{{ entry.subject.subject_name }}</td>
-                    <td>{{ entry.subject.subject_code }}</td>
-                    <td>{{ entry.subject.strand|join:", " }}</td>
-                    <td>{{ entry.subject.year_level }}</td>
-                    <td>{{ entry.subject.semester }}</td>
-                    <td>{{ entry.grade }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
+          <thead>
+    <tr>
+        <th>Subject</th>
+        <th>Subject Code</th>
+        <th>1st Grading</th>
+        <th>2nd Grading</th>
+        <th>3rd Grading</th>
+        <th>4th Grading</th>
+    </tr>
+</thead>
+<tbody>
+    {% for entry in subjects_with_grades %}
+    <tr>
+        <td>{{ entry.subject.subject_name }}</td>
+        <td>{{ entry.subject.subject_code }}</td>
+        <td>{{ entry.prelim }}</td>
+        <td>{{ entry.midterm }}</td>
+        <td>{{ entry.prefinals }}</td>
+        <td>{{ entry.finals }}</td>
+    </tr>
+    {% endfor %}
+</tbody>
         </table>
         <button type="button" onclick="printTable()">Print</button>
     </div>

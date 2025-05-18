@@ -1405,7 +1405,10 @@ def printables(request):
                 grade_obj = Grade.objects.filter(student=selected_student.user, subject=cls).first()
                 subjects_with_grades.append({
                     'subject': cls,
-                    'grade': grade_obj.grade if grade_obj else 'Ungraded'
+                    'prelim': grade_obj.prelim if grade_obj and grade_obj.prelim is not None else 'Ungraded',
+                    'midterm': grade_obj.midterm if grade_obj and grade_obj.midterm is not None else 'Ungraded',
+                    'prefinals': grade_obj.prefinals if grade_obj and grade_obj.prefinals is not None else 'Ungraded',
+                    'finals': grade_obj.finals if grade_obj and grade_obj.finals is not None else 'Ungraded',
                 })
         except Student.DoesNotExist:
             selected_student = None
@@ -1421,6 +1424,7 @@ def printables(request):
         'all_students': Student.objects.all(),  # for search bar
     }
     return render(request, 'printables.html', context)
+
 
 
 def get_student_details(request, student_id):
